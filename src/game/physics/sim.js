@@ -206,7 +206,12 @@ export function createSim(model, hooks = {}) {
       if (onBreak) onBreak(m.id);
     }
     if (group && group.body) {
-      World.remove(engine.world, group.body);
+      // keep broken members in the world as tumbling debris; they only collide
+      // with the ground afterwards (never with the bridge or walkers)
+      group.body.collisionFilter.mask = GROUND_CATEGORY;
+      group.body.plugin.debris = true;
+      group.body.plugin.brokeAt = sim.time;
+      debris.push(group.body);
       for (const j of joints) {
         if (j.memberId === group.id && !j.broken) {
           j.broken = true;
@@ -228,6 +233,7 @@ export function createSim(model, hooks = {}) {
   let crossed = false;
   let fell = false;
   let settled = false;
+  const debris = [];
 
   const updateCableSlack = () => {
     for (const c of cables) {
@@ -263,6 +269,7 @@ export function createSim(model, hooks = {}) {
     nodeBodies,
     joints,
     cables,
+    debris,
     time: 0,
     get activeWalker() { return walker; },
     get brokenCount() { return brokenMembers.size; },

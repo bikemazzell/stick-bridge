@@ -280,9 +280,11 @@ Notes: controller exposes start/tick/onExit/onFall; main loop wires sim hooks to
 - Camera shake: on onBreak, shake amplitude 6 px decaying over 20 ticks. Dust particles at break point (12 puffs max).
 - Draw order: sky, stars/sun/moon, clouds, far canyon, river, near canyon, bridge, walkers, rain, HUD-canvas extras none (HUD is DOM).
 
-- [ ] **Step 1: Implement modules** (pure draw functions, no state machine logic).
-- [ ] **Step 2: Smoke via** a scratch `?drawtest=1` mode in main.js later; verified in e2e.
-- [ ] **Step 3: Commit** `feat: low-poly renderer, sky, weather, characters`
+- [x] **Step 1: Implement modules** (pure draw functions, no state machine logic).
+- [x] **Step 2: Smoke via** a scratch `?drawtest=1` mode in main.js later; verified in e2e. Added tests/render.test.js: pure helper assertions (sky keyframes, celestial swap, seeded weather/stars/scenery) + proxy-ctx smoke of every character drawer and full renderer draw with a live sim (building phase, live bridge, camera shake, dust).
+- [x] **Step 3: Commit** `feat: low-poly renderer, sky, weather, characters`
+
+Notes: broken members stay in the physics world as debris (mask flipped to ground-only so they tumble onto the canyon floor, never block walkers; tracked in sim.debris with plugin.brokeAt for the red flash fade). Stress tint lerps wood tan -> red by joint |ratio|. Day cycle = 3600 ticks (4 game hours). Weather rain chance 30% per seed. Stick bodies drawn from exact world vertices (AABBs are wrong for rotated sticks).
 
 ### Task 9: UI overlays
 
