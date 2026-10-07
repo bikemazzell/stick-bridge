@@ -259,8 +259,10 @@ export function walkerPhase(x, speed) // gait phase for render
 
 Driver logic lives in a small controller `createLadderController(sim, hooks)` in walkers.js: spawns walker i, on exit/fall advances or finishes. Stall rule: if a walker neither crosses nor falls within 1800 ticks (30 s sim), the round ends with reason 'stuck'. Unit-test with a fake sim (object with recorded calls): spawn order matches LADDER, stops after tank, fall stops the ladder, stall ends with 'stuck'.
 
-- [ ] **Step 1: Failing tests** (order, termination, fall stops). **Step 2:** FAIL. **Step 3:** Implement. **Step 4:** Pass.
-- [ ] **Step 5: Commit** `feat: walker ladder controller`
+- [x] **Step 1: Failing tests** (order, termination, fall stops). **Step 2:** FAIL. **Step 3: Implement. Step 4:** Pass.
+- [x] **Step 5: Commit** `feat: walker ladder controller`
+
+Notes: controller exposes start/tick/onExit/onFall; main loop wires sim hooks to onExit/onFall and ticks the controller each frame. onFinish(reason, def) fires once with reason 'survived' (def null) | 'collapsed' | 'stuck'. Stall rule: ticksSinceProgress >= 1800 where progress = walker x advancing > 2px. readX prefers sim.activeWalker.position.x, falls back to sim.walkerX (test seam).
 
 ### Task 8: Renderer (canvas art)
 
