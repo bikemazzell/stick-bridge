@@ -44,7 +44,7 @@ export function validate(model) {
   }
   for (const m of model.members) {
     if (!nodeIds.has(m.a) || !nodeIds.has(m.b)) {
-      errors.push(`member references missing node (${m.id})`);
+      errors.push('member references missing node');
     }
   }
   const byId = new Map(model.nodes.map((n) => [n.id, n]));
@@ -52,7 +52,7 @@ export function validate(model) {
     const a = byId.get(m.a);
     const b = byId.get(m.b);
     if (a && b && Math.hypot(a.x - b.x, a.y - b.y) < 1e-6) {
-      errors.push(`zero-length member (${m.id})`);
+      errors.push('zero-length member');
     }
   }
   return errors;
