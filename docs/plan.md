@@ -171,11 +171,11 @@ export function generateFlat(rng, helpers, budget, stickLen) // etc, all return 
 
 Jitter: node positions +/-3 px (never on anchors), member strength = base * (0.9..1.1).
 
-- [ ] **Step 1: Failing tests** for all invariants above (parametrize over types and 50 seeds; use a deterministic loop of seeds like `seed-${i}`).
-- [ ] **Step 2:** Run, expect FAIL.
-- [ ] **Step 3: Implement** the three generators and dispatcher. Keep geometry math simple: Warren = apex over every 2nd panel node; Pratt/Howe = verticals at panel nodes + diagonals per panel (direction flips between pratt/howe); suspension parabola: y = topY + sag * (1 - ((x - cx) / halfW)^2) inverted, use catenary-approx parabola sampled every panel. Flat generator: if budget >= 2x deck count, double the deck (two glued layers, doubles deck strength).
-- [ ] **Step 4:** Tests pass.
-- [ ] **Step 5: Commit** `feat: bridge generators`
+- [x] **Step 1: Failing tests** for all invariants above (parametrize over types and 50 seeds; use a deterministic loop of seeds like `seed-${i}`).
+- [x] **Step 2:** Run, expect FAIL.
+- [x] **Step 3: Implement** the three generators and dispatcher. Keep geometry math simple: Warren = apex over every 2nd panel node; Pratt/Howe = verticals at panel nodes + diagonals per panel (direction flips between pratt/howe); suspension parabola: y = topY + sag * (1 - ((x - cx) / halfW)^2) inverted, use catenary-approx parabola sampled every panel. Flat generator: if budget >= 2x deck count, double the deck (two glued layers, doubles deck strength).
+- [x] **Step 4:** Tests pass.
+- [x] **Step 5: Commit** `feat: bridge generators`
 
 ### Task 5: Physics simulation
 
