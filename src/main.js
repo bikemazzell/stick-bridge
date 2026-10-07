@@ -1,5 +1,6 @@
 import { WORLD, LADDER, DEFAULTS } from './game/config.js';
 import { generateBridge } from './game/bridge/generator.js';
+import { sticksUsed } from './game/model.js';
 import { createSim } from './game/physics/sim.js';
 import { createGameState, transition } from './game/state.js';
 import { createLadderController } from './game/walkers.js';
@@ -41,9 +42,7 @@ function completeCfg(cfg) {
   return { ...DEFAULTS, ...cfg };
 }
 
-function startRound(cfg) {
-  const full = completeCfg(cfg);
-  gs = transition(gs, 'START', full);
+function beginRound(full) {
   model = generateBridge(full);
   sim = null;
   ctl = null;
@@ -56,7 +55,13 @@ function startRound(cfg) {
   if (result) result.hide();
   hud = createHud(app);
   hud.setSeed(full.seed);
-  hud.setSticks(model.sticksUsed, full.budget);
+  hud.setSticks(sticksUsed(model), full.budget);
+}
+
+function startRound(cfg) {
+  const full = completeCfg(cfg);
+  gs = transition(gs, 'START', full);
+  beginRound(full);
 }
 
 function finishBuilding() {
@@ -106,8 +111,8 @@ function fmtMass(kg) {
 }
 
 function onReplay() {
-  result.hide();
-  startRound(gs.config);
+  gs = transition(gs, 'REPLAY');
+  beginRound(gs.config);
 }
 
 function onNew() {
@@ -143,7 +148,7 @@ function updateHud() {
   if (!hud || !sim || !ctl) return;
   if (ctl.current) hud.setWalker(ctl.current, ctl.index, LADDER.length);
   hud.setStress(sim.maxStrainRatio());
-  hud.setSticks(model.sticksUsed, gs.config.budget);
+  hud.setSticks(sticksUsed(model), gs.config.budget);
   hud.setWeather(renderer.weather ? weatherLabel(renderer.weather) : '');
 }
 

@@ -337,8 +337,10 @@ Notes: query-param auto-start added (src/game/params.js parseParams, unit-tested
   6. Day/night: two screenshots 5 s apart in a running game differ in pixel data (canvas readback via `canvas.toDataURL` in page).
 - Exit code 0 only if all scenarios pass; kill spawned processes in `finally`.
 
-- [ ] **Step 1: Implement runner.** **Step 2:** Run `npm run e2e`, fix app bugs it finds (this is the real integration test). **Step 3:** All green, screenshots exist.
-- [ ] **Step 4: Commit** `test: brave cdp e2e suite`
+- [x] **Step 1: Implement runner.** **Step 2:** Run `npm run e2e`, fix app bugs it finds (this is the real integration test). **Step 3:** All green, screenshots exist.
+- [x] **Step 4: Commit** `test: brave cdp e2e suite`
+
+Bugs e2e caught and fixed: (1) Replay used START from result state which the FSM ignores -> split beginRound/startRound, Replay path transitions REPLAY first; (2) HUD sticks showed `undefined/200` because main.js read `model.sticksUsed` (a function in model.js) -> import + call sticksUsed(model), plus new S4 sticks-format assertion; (3) favicon 404 -> inline SVG data URI. Runner details: builds dist first (preview serves built files), dynamic free ports for both CDP and preview (--host 127.0.0.1 because vite binds IPv6 ::1 otherwise), killTree SIGTERM->SIGKILL in finally. Vision check of screenshots confirmed scene + overlay render correctly.
 
 ### Task 12: Final gate
 
