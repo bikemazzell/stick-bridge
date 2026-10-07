@@ -344,8 +344,10 @@ Bugs e2e caught and fixed: (1) Replay used START from result state which the FSM
 
 ### Task 12: Final gate
 
-- [ ] `npm test` green.
-- [ ] `npm run build` clean.
-- [ ] `npm run e2e` green with screenshots.
-- [ ] Update all checkboxes in this plan; verify spec coverage one last time.
-- [ ] Commit `chore: final gate and plan checkboxes`
+- [x] `npm test` green. (149/149, 11 files)
+- [x] `npm run build` clean.
+- [x] `npm run e2e` green with screenshots. (17 PASS, flat/truss/suspension.png)
+- [x] Update all checkboxes in this plan; verify spec coverage one last time.
+- [x] Commit `chore: final gate and plan checkboxes`
+
+Spec coverage verified: menu (3 type cards with sketches, budget 20-300, stickLen 40-120, seed + dice, rotating hints), build animation, walker ladder (10 walkers fly->tank), stuck rule (1800 ticks), collapse result overlay (heaviest crossed / broke under / fact / Replay / New Bridge), seeded determinism everywhere in game logic, stress HUD %, day/night cycle, seeded weather (rain 30%), canyon + river + trees scenery, camera shake + dust on break, tumbling debris, query params + window.__game debug hooks for e2e. No audio, as specified.
