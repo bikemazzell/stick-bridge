@@ -38,7 +38,7 @@ A 2D educational web game. The player picks a popsicle stick bridge type, sets a
 2. Press Start. The generator builds the bridge with the seed's randomness and animates sticks flying into place. HUD shows sticks used vs budget.
 3. The test ladder begins: walkers cross one at a time, left to right. HUD shows the current walker, its mass, and how many walkers have crossed.
 4. Any stick or cable whose load exceeds its strength snaps, becomes falling debris, and the collapse cascade follows. The walker falls too.
-5. Result screen: what broke it, the heaviest walker that crossed, and one educational fact about that bridge type. Buttons: Replay Same Bridge, New Bridge (back to menu).
+5. Result screen: what broke it, the heaviest walker that crossed, and one educational fact about that bridge type. Buttons: Replay Same Bridge, New Bridge (back to menu). If a walker gets trapped by a sagging deck for too long (no progress, no fall), the round ends as a stuck deck, which also counts as a failure.
 6. If the tank crosses and the bridge stands, the result screen declares the bridge indestructible.
 
 ## Bridge types
@@ -54,7 +54,8 @@ Randomness (seeded, reproducible): panel count jitter, tower height, truss sub-s
 ## Physics model
 
 - Units: pixels and kg scaled down by a global factor for solver stability. Gravity 1g equivalent.
-- Members: rigid stick bodies (thin rectangles) connected at nodes by pin constraints. Strength per stick: a break strain threshold (how far the pin joint stretches before the stick tears loose). Cables break only in tension and go slack in compression (constraint stiffness drops to zero while compressed).
+- Members: rigid stick bodies (thin rectangles) connected at nodes by constraints. Truss structure joints are pinned (one constraint, like a pinned truss). Deck joints are glued (two offset constraints per joint, like real glued popsicle laps), so the deck resists bending instead of sagging like a chain. Strength per stick: a break strain threshold (how far the joint stretches before the stick tears loose). Cables break only in tension and go slack in compression (constraint stiffness drops to zero while compressed).
+- Collision design: bridge members never collide with each other. Walkers collide only with deck members and the ground, so trusses above the deck and suspension towers do not block them. This is the standard 2D bridge game convention.
 - Strain check each tick: strain = (constraint current length minus rest length) / rest length. If strain magnitude exceeds the member threshold, remove the constraint, mark the member broken, spawn debris.
 - Walkers are dynamic circle bodies with realistic relative masses, driven horizontally toward the far side, pressing load down into the deck. When the deck vanishes, they fall.
 - Determinism: fixed timestep (60 Hz accumulator) and a seeded RNG so a given seed and choices produce the same bridge and the same ladder.
