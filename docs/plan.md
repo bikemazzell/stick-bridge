@@ -297,8 +297,10 @@ Notes: broken members stay in the physics world as debris (mask flipped to groun
 - result.js: `createResult(root, onReplay, onNew)` -> `{ show(payload), hide() }`. Payload: title (Collapsed! / Indestructible!), heaviest crossed line, broke-by line, fact, buttons Replay / New Bridge. `data-screen="result"`.
 - All overlays absolute-positioned over canvas; CSS fun rounded cards, no external fonts.
 
-- [ ] **Step 1: Implement.** **Step 2: Verify in browser via e2e (Task 11).**
-- [ ] **Step 3: Commit** `feat: menu, hud, result overlays`
+- [x] **Step 1: Implement.** **Step 2:** Verified via jsdom unit tests (tests/ui.test.js): card selection + Start emits config, live slider outputs, dice, hint rotation, HUD pill setters incl. stress clamping and ton formatting, result show/hide + button handlers. Browser verification in e2e (Task 11).
+- [x] **Step 3: Commit** `feat: menu, hud, result overlays`
+
+Notes: menu cards include mini canvas sketches (src/ui/sketch.js drawTypeSketch, null-ctx guard for jsdom); seed defaults 'pop-1'; hint rotates every 5 s; result panel data-screen="result" starts hidden.
 
 ### Task 10: Main wiring
 
