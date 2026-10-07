@@ -201,7 +201,7 @@ export function createSim(model, hooks) // -> sim
 - maxStrainRatio(): max over live joints of strainRatio, for HUD stress colors.
 - Fixed stepping: tick(1000/60) calls Engine.update(engine, 1000/60) exactly once. No wall clock inside sim.
 
-- [ ] **Step 1: Failing tests:**
+- [x] **Step 1: Failing tests:**
   1. Flat bridge, budget 30 (deck only), fly walker: survives 300 ticks, walker crossed.
   2. Flat bridge, minimal deck, human walker: breaks within 600 ticks (brokenCount > 0), onWalkerFall fired.
   3. Truss, budget 200, stickLen 80, human walker: survives (brokenCount === 0) and crosses within 1500 ticks.
@@ -209,10 +209,19 @@ export function createSim(model, hooks) // -> sim
   5. Cable slack unit: two anchored bodies joined by cable, push together -> cable constraint stiffness 0, pull apart -> restored; overstretch cable breaks.
   6. Determinism: two sims same model, same op sequence -> same broken member ids in same order.
   7. strainRatio: loaded flat bridge mid-deck joint has higher ratio than near-anchor joint under walker at center.
-- [ ] **Step 2:** Run, expect FAIL.
-- [ ] **Step 3: Implement.** Calibrate MATERIAL.breakStretch / densities until invariants hold. If test 3 will not pass with any threshold, weaken walker masses via MASS_SCALE first (document final values in config).
-- [ ] **Step 4:** Tests pass.
-- [ ] **Step 5: Commit** `feat: physics simulation with breaking joints`
+- [x] **Step 2:** Run, expect FAIL.
+- [x] **Step 3: Implement.** Calibrate MATERIAL.breakStretch / densities until invariants hold. If test 3 will not pass with any threshold, weaken walker masses via MASS_SCALE first (document final values in config).
+- [x] **Step 4:** Tests pass.
+- [x] **Step 5: Commit** `feat: physics simulation with breaking joints`
+
+**Calibration notes (final design):**
+- Parallel stick members sharing both endpoints merge into ONE laminate rect body (thickness 6*n, strength = sum of member strengths). Deck laminate top-aligned with cliff surface.
+- Structure bracing and tower members get strength bonus x3.5 (axial-load argument). Deck lamination (up to 4 layers) lives in truss.js/suspension.js generators; flat stays single-layer.
+- Engine: gravity scale 0.0005, constraintIterations 10 (4 diverges on pratt/howe triangulation).
+- One pin joint per adjacent laminate pair per node, stiffness 0.95, damping 0.05. No glue offset constraints (over-constrained). Matter self-rotates constraint offsets by (body.angle - angleA); compute offsets from creation-time world position and read stretch via Constraint.pointAWorld/pointBWorld.
+- Settle: 450 ticks at first spawnWalker, then one-time velocity zeroing and per-joint baseline capture; ratio = (stretch - baseline)/strength. Walker drive = smooth accel toward speed (max dv 0.08/tick).
+- Cables: damping 0 (damping brakes light clamp bodies), slack check each tick, pure-cable nodes get r=2 clamp circles.
+- Final constants in config.js: stick breakStretch 0.6 / density 0.0002, cable stiffness 0.06 / breakStretch 14.0, MASS_SCALE 0.05.
 
 ### Task 6: Game state machine
 

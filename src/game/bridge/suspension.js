@@ -21,7 +21,7 @@ export function buildSuspension(model, rng, stickLen) {
     for (let s = 1; s <= segs; s++) {
       const y = base.y - (towerHeight * s) / segs;
       const top = s === segs ? addNode(model, base.x, towerTopY) : addNode(model, base.x, y);
-      addMember(model, prev.id, top.id, 'stick', strengthFor(rng, 'stick'));
+      addMember(model, prev.id, top.id, 'stick', strengthFor(rng, "stick") * 3.5);
       prev = top;
     }
     return { x: base.x, top: prev };
@@ -56,6 +56,15 @@ export function buildSuspension(model, rng, stickLen) {
       addMember(model, p.id, node.id, 'cable', strengthFor(rng, 'cable'));
       p = node;
     }
+  }
+
+  // laminate the deck with any leftover stick budget
+  let leftover = model.budget - sticksUsed(model);
+  for (let layer = 2; layer <= 4 && leftover >= deck.nodes.length - 1; layer++) { leftover -= deck.nodes.length - 1;
+    for (let i = 1; i < deck.nodes.length; i++) {
+      addMember(model, deck.nodes[i - 1].id, deck.nodes[i].id, 'stick', strengthFor(rng, 'stick'));
+    }
+    model.meta.deckLayers = 2;
   }
 
   model.meta.towerHeight = towerHeight;

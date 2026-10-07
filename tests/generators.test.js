@@ -80,11 +80,11 @@ describe('flat generator', () => {
     expect(model.meta.deckLayers).toBe(1);
   });
 
-  it('doubles the deck when budget allows', () => {
+  it('spends leftover budget on nothing: a flat beam is a single stick layer', () => {
     const model = generateBridge({ type: 'flat', seed: 'f2', budget: 300, stickLen: 80 });
     const deck = deckPath(model);
-    expect(model.meta.deckLayers).toBe(2);
-    expect(sticksUsed(model)).toBe((deck.nodes.length - 1) * 2);
+    expect(model.meta.deckLayers).toBe(1);
+    expect(sticksUsed(model)).toBe(deck.nodes.length - 1);
   });
 });
 
@@ -156,10 +156,16 @@ describe('suspension generator', () => {
 describe('strength scatter', () => {
   it('varies member strength around the base value', () => {
     const model = generateBridge({ type: 'truss', seed: 'str', budget: 120, stickLen: 80 });
+    const deckIds = new Set(deckPath(model).members.map((m) => m.id));
     const sticks = model.members.filter((m) => m.material === 'stick');
     for (const m of sticks) {
-      expect(m.strength).toBeGreaterThanOrEqual(MATERIAL.stick.breakStretch * 0.9 - 1e-9);
-      expect(m.strength).toBeLessThanOrEqual(MATERIAL.stick.breakStretch * 1.1 + 1e-9);
+      if (deckIds.has(m.id)) {
+        expect(m.strength).toBeGreaterThanOrEqual(MATERIAL.stick.breakStretch * 0.9 - 1e-9);
+        expect(m.strength).toBeLessThanOrEqual(MATERIAL.stick.breakStretch * 1.1 + 1e-9);
+      } else {
+        // bracing carries axial loads: stronger than the walking surface
+        expect(m.strength).toBeGreaterThan(MATERIAL.stick.breakStretch);
+      }
     }
     const strengths = new Set(sticks.map((m) => m.strength));
     expect(strengths.size).toBeGreaterThan(1);

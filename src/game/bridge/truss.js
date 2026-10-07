@@ -78,8 +78,17 @@ export function buildTruss(model, rng, stickLen) {
     if (remaining <= 0) break;
     const a = c.from.deck !== undefined ? deck.nodes[c.from.deck] : topNode(`t${c.from.top}`, c.from.y);
     const b = c.to.deck !== undefined ? deck.nodes[c.to.deck] : topNode(`t${c.to.top}`, c.to.y);
-    addMember(model, a.id, b.id, 'stick', strengthFor(rng, 'stick'));
+    addMember(model, a.id, b.id, 'stick', strengthFor(rng, "stick") * 3.5);
     remaining--;
+  }
+
+  // laminate the deck when sticks are left over: a second glued layer doubles
+  // the walking surface strength
+  for (let layer = 2; layer <= 4 && remaining >= deck.nodes.length - 1; layer++) { remaining -= deck.nodes.length - 1;
+    for (let i = 1; i < deck.nodes.length; i++) {
+      addMember(model, deck.nodes[i - 1].id, deck.nodes[i].id, 'stick', strengthFor(rng, 'stick'));
+    }
+    model.meta.deckLayers = 2;
   }
   model.meta.substyle = substyle;
 }

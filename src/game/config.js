@@ -9,21 +9,21 @@ export const WORLD = {
 
 export const MATERIAL = {
   stick: {
-    breakStretch: 3.0,
-    stiffness: 0.9,
-    damping: 0.08,
+    breakStretch: 0.6,
+    stiffness: 0.95,
+    damping: 0.05,
     thickness: 6,
-    density: 0.0012,
+    density: 0.0002,
   },
   cable: {
     breakStretch: 14.0,
     stiffness: 0.06,
-    damping: 0.02,
+    damping: 0,
     thickness: 3,
   },
 };
 
-export const MASS_SCALE = 0.002;
+export const MASS_SCALE = 0.05;
 
 export const LADDER = [
   { id: 'fly', name: 'Fly', massKg: 0.01, speed: 2.0, size: 5, fact: 'A fly weighs about as much as a raindrop.' },
