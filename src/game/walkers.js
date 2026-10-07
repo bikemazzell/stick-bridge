@@ -87,6 +87,13 @@ export function createLadderController(sim, hooks = {}) {
       if (this.finished || !this.current || id !== this.current.id) return;
       this.finish('collapsed', this.current);
     },
+
+    skip(index) {
+      if (this.finished) return;
+      if (!nextWalker(index)) return;
+      this.index = index;
+      this.spawnCurrent();
+    },
   };
   return ctl;
 }

@@ -313,9 +313,11 @@ Notes: menu cards include mini canvas sketches (src/ui/sketch.js drawTypeSketch,
 - Query params for tests: `?seed=`, `?type=`, `?budget=`, `?stickLen=`, `?speed=` (sim steps per frame multiplier, default 1). Debug handle `window.__game = { getState, getConfig, skipToWalker(i) }` for e2e.
 - Resize: scale canvas CSS size, keep 1280x720 logical, letterbox.
 
-- [ ] **Step 1: Implement.**
-- [ ] **Step 2: Smoke:** `npm run build` clean; `npm run preview` serves; `curl localhost:4173` returns HTML.
-- [ ] **Step 3: Commit** `feat: main game loop and wiring`
+- [x] **Step 1: Implement.**
+- [x] **Step 2: Smoke:** `npm run build` clean; `npm run preview` serves; `curl localhost:4173` returns HTML.
+- [x] **Step 3: Commit** `feat: main game loop and wiring`
+
+Notes: query-param auto-start added (src/game/params.js parseParams, unit-tested; merges with DEFAULTS); ladder controller gained skip(index) for `skipToWalker`; sim keeps rendering during result state (frozen collapse scene); HUD updates every 10 ticks incl. weather label from renderer weather.
 
 ### Task 11: E2E suite (Brave CDP)
 

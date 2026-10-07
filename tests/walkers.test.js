@@ -139,4 +139,18 @@ describe('ladder controller', () => {
     ctl.onFall('fly');
     expect(() => ctl.tick()).not.toThrow();
   });
+
+  it('skip jumps the ladder index and respawns', () => {
+    const sim = fakeSim(() => 300);
+    const ctl = createLadderController(sim);
+    ctl.start();
+    ctl.skip(6);
+    expect(ctl.index).toBe(6);
+    expect(ctl.current.id).toBe('horse');
+    expect(sim.spawned).toEqual(['fly', 'horse']);
+    ctl.skip(99);
+    expect(ctl.index).toBe(6);
+    ctl.onExit('horse');
+    expect(ctl.current.id).toBe('car');
+  });
 });
