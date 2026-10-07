@@ -238,9 +238,11 @@ export function transition(gs, event, payload) // pure-ish reducer, returns gs
 // tracks: heaviestCrossedKg, heaviestCrossedName, brokeBy {name}, resultReason, fact (from FACTS by type), walkerIndex
 ```
 
-- [ ] **Step 1: Failing tests:** menu + START(cfg) -> building; building + BUILT -> testing; testing + WALKER_EXIT updates heaviest; testing + WALKER_FALL(name) -> result with reason 'collapsed', brokeBy=name, fact present; testing + DONE (tank crossed) -> result 'survived'; result + REPLAY -> building; result + NEW -> menu; unknown event in state throws or is ignored (assert ignored).
-- [ ] **Step 2:** Run FAIL. **Step 3: Implement. Step 4: Pass.**
-- [ ] **Step 5: Commit** `feat: game state machine`
+- [x] **Step 1: Failing tests:** menu + START(cfg) -> building; building + BUILT -> testing; testing + WALKER_EXIT updates heaviest; testing + WALKER_FALL(name) -> result with reason 'collapsed', brokeBy=name, fact present; testing + DONE (tank crossed) -> result 'survived'; result + REPLAY -> building; result + NEW -> menu; unknown event in state throws or is ignored (assert ignored).
+- [x] **Step 2:** Run FAIL. **Step 3: Implement. Step 4:** Pass.
+- [x] **Step 5: Commit** `feat: game state machine`
+
+Notes: reducer is pure (returns new state, input untouched); fact picked deterministically via hashSeed(config.seed) % FACTS[type].length; REPLAY resets round tracking and keeps config; DONE accepts optional payload.reason ('survived' default, 'stuck' for ladder stalls); BROKE appends to brokenMembers for HUD.
 
 ### Task 7: Walker ladder driver
 
