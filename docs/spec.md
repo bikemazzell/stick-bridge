@@ -77,12 +77,12 @@ Order, name, mass, note:
 | 9 | Elephant | 5000 kg | |
 | 10 | Tank | 42000 kg | final boss |
 
-Each walker has a distinct low-poly look and a simple two-leg or multi-leg walk cycle. Speed scales down with size. The next walker starts after the previous one exits the far side.
+Each walker has a distinct low-poly look and a simple two-leg or multi-leg walk cycle. Speed scales down with size. The next walker starts after the previous one exits the far side. If a walker is stuck in one spot for more than 5 seconds (300 ticks, from bridge design or breakage), a speech bubble appears above it with random expletive glyphs and angry emojis (for example `@$!`, `\u{1F621}\u{1F627}\u{1F92C}`), reshuffling while it stays stuck. The bubble is seeded fun: deterministic per seed and tick, no audio.
 
 ## Look and feel
 
 - Low-poly: flat shaded triangles and rectangles, bold outlines optional, saturated but harmonious palette (paper-craft vibe).
-- Scenery: layered canyon silhouette parallax, river at the canyon bottom, sparse low-poly trees, sun and clouds.
+- Scenery: layered canyon silhouette parallax, river at the canyon bottom, sparse low-poly trees, sun and clouds. The canyon scene varies per seed: jag count and amplitude of the cliff faces, the mountain ridge lines of both backdrop layers (point count, positions, heights), tree count per cliff, and river shimmer density all draw from the seed, so two seeds rarely look alike.
 - Weather and time: a slow day/night sky gradient cycle; drifting clouds; occasional rain (seeded); birds passing. Rain is cosmetic, no physics effect.
 - Stress view: sticks tint from green (safe) through yellow to red (about to snap), always on during the test. This is the main educational readout.
 - Break moment: snapped sticks tumble as debris, small dust puff particles, brief camera shake.

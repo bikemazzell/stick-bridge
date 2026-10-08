@@ -478,3 +478,50 @@ Three UX behaviors: (1) every cold start of the page randomizes the menu seed (U
 - [x] `npx vitest run` green (175/175).
 - [x] `npm run e2e` green; suspension.png vision check: towers above deck, cable arcs over towers sagging above deck, hangers visible, nothing below deck.
 - [x] Commit `fix: suspension towers buckle and cables hang below deck`
+
+---
+
+## Feature: Stuck-walker speech bubbles + randomized canyon scene
+
+Two additions: (1) a walker stuck in one spot for more than 5 seconds (300 ticks) shows a speech bubble of random expletive glyphs/angry emojis above its head, reshuffling every 45 ticks while stuck - deterministic per seed+tick (never Math.random in game logic); (2) the canyon scenery varies per seed - cliff jag count/amplitude, backdrop mountain ridge lines (both layers), tree count per cliff, river shimmer density - instead of the same fixed jaggy silhouette every round.
+
+### Task 24: Rant module + stuck-bubble constant
+
+**Files:**
+- Create: `src/game/rant.js`
+- Modify: `src/game/config.js` (export `STUCK_BUBBLE_TICKS = 300`)
+- Test: `tests/rant.test.js`, `tests/config.test.js`
+
+- [ ] **Step 1: Failing tests.** rantFor(seed, tick): deterministic (same seed+tick = same string), glyphs-only from the exported GLYPHS set, length 3-4, changes when the 45-tick window advances, same string across the window. Config: STUCK_BUBBLE_TICKS is 300.
+- [ ] **Step 2: Implement.** `GLYPHS` array ('@','#','$','!','?','%','&' + angry emojis), `rantFor(seed, tick)` builds `rngHelpers(makeRng(seed + ':rant:' + floor(tick/45)))`, picks int(3,4) glyphs.
+- [ ] **Step 3: `npx vitest run` green.**
+- [ ] **Step 4: Commit** `feat: deterministic rant generator for stuck walkers`
+
+### Task 25: Speech bubble rendering + stuck wiring
+
+**Files:**
+- Modify: `src/render/characters.js` (export `drawSpeechBubble(ctx, x, y, text)`), `src/render/renderer.js` (draw w.rant bubbles), `src/main.js` (attach rant when `ctl.ticksSinceProgress >= STUCK_BUBBLE_TICKS`)
+- Test: `tests/render.test.js`
+
+- [ ] **Step 1: Failing test.** drawSpeechBubble smoke with the fake ctx (no throw, calls beginPath/fillText); renderer smoke frameState with a walker carrying `rant` draws without throwing.
+- [ ] **Step 2: Implement.** Bubble: rounded rect + tail above the walker head, text via fillText; renderer draws it for walkers with a rant; main.js computes `rantFor(gs.config.seed, tickCount)` when stuck >= 300 ticks (exposed `ctl.ticksSinceProgress` already public).
+- [ ] **Step 3: `npx vitest run` green.**
+- [ ] **Step 4: Commit** `feat: stuck walkers show angry speech bubbles`
+
+### Task 26: Randomized canyon scene
+
+**Files:**
+- Modify: `src/render/scenery.js`
+- Test: `tests/render.test.js`
+
+- [ ] **Step 1: Failing tests.** createScenery: wallJags.left/right length in 4..7 and varies across seeds (>= 2 distinct counts over 10 seeds); ridge1/ridge2 arrays of 3..6 seeded points {xFrac in 0..1, h > 0}, varying across seeds; trees length in 6..10 (3-5 per cliff); riverSticks length 5..9; same seed still fully deterministic (existing test). drawScenery smoke with fake ctx does not throw.
+- [ ] **Step 2: Implement.** Draw both backdrop layers from ridge points (x = gapX0 - 30 + xFrac * (span + 60), peaks subtract h from the layer base line); jag count/amplitude from seed; tree and river counts from seed.
+- [ ] **Step 3: `npx vitest run` green.**
+- [ ] **Step 4: Commit** `feat: per-seed randomized canyon and backdrop`
+
+### Task 27: Final gate (bubbles + scenery feature)
+
+- [ ] `npm test` green.
+- [ ] `npm run build` clean.
+- [ ] `npm run e2e` green (full suite).
+- [ ] Manual visual check of a stuck-bubble round via dev server; tick all checkboxes above; commit `chore: bubbles and scenery final gate`
