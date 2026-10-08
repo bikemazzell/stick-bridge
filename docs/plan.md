@@ -492,10 +492,10 @@ Two additions: (1) a walker stuck in one spot for more than 5 seconds (300 ticks
 - Modify: `src/game/config.js` (export `STUCK_BUBBLE_TICKS = 300`)
 - Test: `tests/rant.test.js`, `tests/config.test.js`
 
-- [ ] **Step 1: Failing tests.** rantFor(seed, tick): deterministic (same seed+tick = same string), glyphs-only from the exported GLYPHS set, length 3-4, changes when the 45-tick window advances, same string across the window. Config: STUCK_BUBBLE_TICKS is 300.
-- [ ] **Step 2: Implement.** `GLYPHS` array ('@','#','$','!','?','%','&' + angry emojis), `rantFor(seed, tick)` builds `rngHelpers(makeRng(seed + ':rant:' + floor(tick/45)))`, picks int(3,4) glyphs.
-- [ ] **Step 3: `npx vitest run` green.**
-- [ ] **Step 4: Commit** `feat: deterministic rant generator for stuck walkers`
+- [x] **Step 1: Failing tests.** rantFor(seed, tick): deterministic (same seed+tick = same string), glyphs-only from the exported GLYPHS set, length 3-4, changes when the 45-tick window advances, same string across the window. Config: STUCK_BUBBLE_TICKS is 300.
+- [x] **Step 2: Implement.** `GLYPHS` array ('@','#','$','!','?','%','&' + angry emojis), `rantFor(seed, tick)` builds `rngHelpers(makeRng(seed + ':rant:' + floor(tick/45)))`, picks int(3,4) glyphs.
+- [x] **Step 3: `npx vitest run` green.**
+- [x] **Step 4: Commit** `feat: deterministic rant generator for stuck walkers`
 
 ### Task 25: Speech bubble rendering + stuck wiring
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { WORLD, MATERIAL, MASS_SCALE, LADDER, FACTS, HINTS, DEFAULTS, SPAN, worldFor } from '../src/game/config.js';
+import { WORLD, MATERIAL, MASS_SCALE, LADDER, FACTS, HINTS, DEFAULTS, SPAN, worldFor, STUCK_BUBBLE_TICKS } from '../src/game/config.js';
 
 describe('WORLD', () => {
   it('has a sane canyon layout', () => {
@@ -101,5 +101,11 @@ describe('MASS_SCALE', () => {
   it('scales masses down', () => {
     expect(MASS_SCALE).toBeGreaterThan(0);
     expect(MASS_SCALE).toBeLessThan(1);
+  });
+});
+
+describe('STUCK_BUBBLE_TICKS', () => {
+  it('is five seconds at 60 ticks per second', () => {
+    expect(STUCK_BUBBLE_TICKS).toBe(300);
   });
 });

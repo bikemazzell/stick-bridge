@@ -47,6 +47,9 @@ export const MATERIAL = {
 
 export const MASS_SCALE = 0.05;
 
+// stuck walker shows its frustration bubble after 5 s (60 ticks/s) in one spot
+export const STUCK_BUBBLE_TICKS = 300;
+
 export const LADDER = [
   { id: 'fly', name: 'Fly', massKg: 0.01, speed: 2.0, size: 5, fact: 'A fly weighs about as much as a raindrop.' },
   { id: 'mouse', name: 'Mouse', massKg: 0.05, speed: 1.8, size: 8, fact: 'A mouse weighs less than a slice of bread.' },
