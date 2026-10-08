@@ -1,8 +1,6 @@
-import { WORLD } from '../config.js';
+import { worldFor } from '../config.js';
 import { addNode, addMember, sticksUsed } from '../model.js';
-import { buildDeck, strengthFor, spanWidth } from './deck.js';
-
-const { gapX0, deckY } = WORLD;
+import { buildDeck, strengthFor } from './deck.js';
 
 function deckRef(i) {
   return { deck: i };
@@ -12,12 +10,12 @@ function topRef(i, y) {
   return { top: i, y };
 }
 
-function scoreOf(ref, n) {
+function scoreOf(ref, deck, centerX) {
   const i = ref.deck ?? ref.top;
-  return Math.abs(gapX0 + i * (spanWidth() / n) - (gapX0 + spanWidth() / 2));
+  return Math.abs(deck.nodes[i].x - centerX);
 }
 
-function warrenCandidates(deck, h) {
+function warrenCandidates(deck, h, deckY) {
   const n = deck.panels;
   const items = [];
   const last = n / 2 - 1;
@@ -31,13 +29,10 @@ function warrenCandidates(deck, h) {
     items.push({ from: deckRef(0), to: topRef(2, deckY - h) });
     items.push({ from: topRef(2 * last, deckY - h), to: deckRef(n) });
   }
-  return items.map((it) => ({
-    ...it,
-    score: (scoreOf(it.from, n) + scoreOf(it.to, n)) / 2,
-  }));
+  return items;
 }
 
-function latticeCandidates(deck, h, flipped) {
+function latticeCandidates(deck, h, flipped, deckY) {
   const n = deck.panels;
   const items = [];
   for (let i = 1; i <= n - 1; i++) items.push({ from: deckRef(i), to: topRef(i, deckY - h) });
@@ -46,21 +41,24 @@ function latticeCandidates(deck, h, flipped) {
     if (flipped) items.push({ from: topRef(i, deckY - h), to: deckRef(i + 1) });
     else items.push({ from: deckRef(i), to: topRef(i + 1, deckY - h) });
   }
-  return items.map((it) => ({
-    ...it,
-    score: (scoreOf(it.from, n) + scoreOf(it.to, n)) / 2,
-  }));
+  return items;
 }
 
 export function buildTruss(model, rng, stickLen) {
+  const g = worldFor(model.span);
   const deck = buildDeck(model, rng, stickLen);
+  const centerX = (g.gapX0 + g.gapX1) / 2;
   const substyle = rng.pick(['warren', 'pratt', 'howe']);
   const h = rng.range(40, 90);
 
+  const withScores = (items) => items.map((it) => ({
+    ...it,
+    score: (scoreOf(it.from, deck, centerX) + scoreOf(it.to, deck, centerX)) / 2,
+  }));
   const candidates =
     substyle === 'warren'
-      ? warrenCandidates(deck, h)
-      : latticeCandidates(deck, h, substyle === 'howe');
+      ? withScores(warrenCandidates(deck, h, g.deckY))
+      : withScores(latticeCandidates(deck, h, substyle === 'howe', g.deckY));
   candidates.sort((a, b) => a.score - b.score);
 
   const tops = new Map();

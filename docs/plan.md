@@ -378,10 +378,10 @@ Budget safety: at span max 800 and stickLen min 40 the deck needs ceil(800/40) =
 - Modify: `src/game/bridge/deck.js`, `src/game/bridge/truss.js`, `src/game/bridge/suspension.js`, `src/game/bridge/generator.js`
 - Test: `tests/generators.test.js`
 
-- [ ] **Step 1: Failing tests.** Parametrized (3 types x spans [480, 800] x budgets [20, 200]): `validate` empty, connected, `sticksUsed <= budget`, anchors fixed at exact `worldFor(span)` corners, deck chain complete with spacing `<= stickLen + 7`, reproducible per seed. Suspension degenerate: span 800 / budget 20 / stickLen 40 stays within budget (no towers).
-- [ ] **Step 2: Implement.** deck.js: drop `WORLD` destructure + `spanWidth()`, use `worldFor(model.span)`; same for truss.js (score via `deck.nodes[i].x`, candidates take `deckY` param) and suspension.js (geometry per model; `remaining < 2` skips towers/cables, `meta.towerHeight = 0`). generator.js: accept + forward `span`.
-- [ ] **Step 3: `npx vitest run` green.**
-- [ ] **Step 4: Commit** `feat: span-aware bridge generators`
+- [x] **Step 1: Failing tests.** Parametrized (3 types x spans [480, 800] x budgets [20, 200]): `validate` empty, connected, `sticksUsed <= budget`, anchors fixed at exact `worldFor(span)` corners, deck chain complete with spacing `<= stickLen + 7`, reproducible per seed. Suspension degenerate: span 800 / budget 20 / stickLen 40 stays within budget (no towers).
+- [x] **Step 2: Implement.** deck.js: drop `WORLD` destructure + `spanWidth()`, use `worldFor(model.span)`; same for truss.js (score via `deck.nodes[i].x`, candidates take `deckY` param) and suspension.js (geometry per model; `remaining < 2` skips towers/cables, `meta.towerHeight = 0`). generator.js: accept + forward `span`.
+- [x] **Step 3: `npx vitest run` green.**
+- [x] **Step 4: Commit** `feat: span-aware bridge generators`
 
 ### Task 15: Span-aware physics
 

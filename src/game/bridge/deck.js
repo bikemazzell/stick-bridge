@@ -1,18 +1,13 @@
-import { WORLD, MATERIAL } from '../config.js';
+import { worldFor, MATERIAL } from '../config.js';
 import { addNode, addMember } from '../model.js';
-
-const { gapX0, gapX1, deckY } = WORLD;
 
 export function strengthFor(rng, material) {
   return MATERIAL[material].breakStretch * rng.range(0.9, 1.1);
 }
 
-export function spanWidth() {
-  return gapX1 - gapX0;
-}
-
 export function buildDeck(model, rng, stickLen) {
-  const span = spanWidth();
+  const { gapX0, gapX1, deckY } = worldFor(model.span);
+  const span = gapX1 - gapX0;
   let panels = Math.ceil(span / stickLen);
   if (panels % 2 === 1) panels += 1;
   if (panels < 2) panels = 2;

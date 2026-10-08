@@ -1,14 +1,20 @@
-import { WORLD } from '../config.js';
+import { worldFor } from '../config.js';
 import { addNode, addMember, sticksUsed } from '../model.js';
-import { buildDeck, strengthFor, spanWidth } from './deck.js';
-
-const { gapX0, gapX1, deckY } = WORLD;
+import { buildDeck, strengthFor } from './deck.js';
 
 export function buildSuspension(model, rng, stickLen) {
+  const { gapX0, gapX1, deckY } = worldFor(model.span);
   const deck = buildDeck(model, rng, stickLen);
-  const span = spanWidth();
+  const span = gapX1 - gapX0;
 
   const remaining = model.budget - sticksUsed(model);
+  // a tower needs at least one stick per side; with less left the suspension
+  // degenerates to a plain deck so the budget invariant always holds
+  if (remaining < 2) {
+    model.meta.towerHeight = 0;
+    model.meta.sag = 0;
+    return;
+  }
   const perTower = Math.floor(remaining / 2);
   const desired = rng.range(120, 200);
   const towerHeight = Math.max(40, Math.min(desired, perTower * stickLen * 0.95));

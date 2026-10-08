@@ -10,10 +10,10 @@ const BUILDERS = {
   suspension: buildSuspension,
 };
 
-export function generateBridge({ type, seed, budget, stickLen, rng }) {
+export function generateBridge({ type, seed, budget, stickLen, span, rng }) {
   const builder = BUILDERS[type];
   if (!builder) throw new Error(`unknown bridge type: ${type}`);
-  const model = createModel(type, seed, budget, stickLen);
+  const model = createModel(type, seed, budget, stickLen, span);
   const helpers = rng ?? rngHelpers(makeRng(seed));
   builder(model, helpers, stickLen);
   return model;

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { generateBridge } from '../src/game/bridge/generator.js';
 import { validate, isConnected, deckPath, sticksUsed } from '../src/game/model.js';
-import { WORLD, MATERIAL } from '../src/game/config.js';
+import { WORLD, MATERIAL, worldFor } from '../src/game/config.js';
 
 const { gapX0, gapX1, deckY } = WORLD;
 const TYPES = ['flat', 'truss', 'suspension'];
@@ -9,6 +9,13 @@ const TYPES = ['flat', 'truss', 'suspension'];
 function anchors(model) {
   const left = model.nodes.find((n) => Math.abs(n.x - gapX0) <= 0.01 && Math.abs(n.y - deckY) <= 0.01);
   const right = model.nodes.find((n) => Math.abs(n.x - gapX1) <= 0.01 && Math.abs(n.y - deckY) <= 0.01);
+  return { left, right };
+}
+
+function spanAnchors(model, span) {
+  const g = worldFor(span);
+  const left = model.nodes.find((n) => Math.abs(n.x - g.gapX0) <= 0.01 && Math.abs(n.y - g.deckY) <= 0.01);
+  const right = model.nodes.find((n) => Math.abs(n.x - g.gapX1) <= 0.01 && Math.abs(n.y - g.deckY) <= 0.01);
   return { left, right };
 }
 
@@ -150,6 +157,63 @@ describe('suspension generator', () => {
     const tight = generateBridge({ type: 'suspension', seed: 'tight', budget: 22, stickLen: 40 });
     expect(sticksUsed(tight)).toBeLessThanOrEqual(22);
     expect(tight.meta.towerHeight).toBeLessThan(120);
+  });
+});
+
+describe('variable span', () => {
+  const cases = [];
+  for (const type of TYPES) {
+    for (const span of [480, 800]) {
+      for (const budget of [20, 200]) {
+        cases.push([type, span, budget]);
+      }
+    }
+  }
+
+  it.each(cases)('%s span=%i budget=%i anchors the deck at the span gap', (type, span, budget) => {
+    const model = generateBridge({ type, seed: `span-${type}-${span}-${budget}`, budget, stickLen: 80, span });
+    expect(model.span).toBe(span);
+    expect(validate(model)).toEqual([]);
+    expect(isConnected(model)).toBe(true);
+    expect(sticksUsed(model)).toBeLessThanOrEqual(budget);
+
+    const { left, right } = spanAnchors(model, span);
+    expect(left, 'left anchor at span gapX0').toBeTruthy();
+    expect(right, 'right anchor at span gapX1').toBeTruthy();
+    expect(left.fixed).toBe(true);
+    expect(right.fixed).toBe(true);
+
+    const deck = deckPath(model);
+    expect(deck.nodes[0].id).toBe(left.id);
+    expect(deck.nodes[deck.nodes.length - 1].id).toBe(right.id);
+    for (let i = 1; i < deck.nodes.length; i++) {
+      const d = Math.hypot(deck.nodes[i].x - deck.nodes[i - 1].x, deck.nodes[i].y - deck.nodes[i - 1].y);
+      expect(d).toBeLessThanOrEqual(80 + 7);
+    }
+  });
+
+  it('completes a max-span deck at the minimum budget', () => {
+    const model = generateBridge({ type: 'flat', seed: 'wide', budget: 20, stickLen: 40, span: 800 });
+    const g = worldFor(800);
+    const deck = deckPath(model);
+    expect(deck.nodes).toHaveLength(21);
+    expect(Math.abs(deck.nodes[0].x - g.gapX0)).toBeLessThanOrEqual(0.01);
+    expect(Math.abs(deck.nodes[deck.nodes.length - 1].x - g.gapX1)).toBeLessThanOrEqual(0.01);
+    expect(sticksUsed(model)).toBeLessThanOrEqual(20);
+  });
+
+  it('is reproducible for the same seed at a custom span', () => {
+    const a = generateBridge({ type: 'truss', seed: 'wSame', budget: 200, stickLen: 80, span: 800 });
+    const b = generateBridge({ type: 'truss', seed: 'wSame', budget: 200, stickLen: 80, span: 800 });
+    expect(a).toEqual(b);
+  });
+
+  it('suspension skips towers when only the deck fits the budget', () => {
+    const model = generateBridge({ type: 'suspension', seed: 'wTight', budget: 20, stickLen: 40, span: 800 });
+    expect(sticksUsed(model)).toBeLessThanOrEqual(20);
+    expect(model.meta.towerHeight).toBe(0);
+    expect(validate(model)).toEqual([]);
+    expect(isConnected(model)).toBe(true);
   });
 });
 
