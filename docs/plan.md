@@ -527,3 +527,31 @@ Two additions: (1) a walker stuck in one spot for more than 5 seconds (300 ticks
 - [x] Manual visual check of a stuck-bubble round via dev server; tick all checkboxes above; commit `chore: bubbles and scenery final gate`
 
 Notes: a genuinely-stuck round needed the exit hooks wired in the probe (fly crossing on flat/300/120 was a probe artifact); the real stall is the elephant (walker 8) on suspension/300/120 seed stuck-0. Headless screenshot at 3x confirmed the white tailed bubble above the stuck elephant with bold glyph text (symbols render everywhere; emoji legibility depends on system emoji fonts, fine in desktop Brave). 194/194 unit, build clean, e2e 32/32.
+
+---
+
+## Feature: Under-deck support piers for truss and suspension
+
+Truss and suspension bridges get at least two glued support columns (piers) standing on the canyon floor under interior deck nodes when the budget allows, placed center-out (so the minimum pair sits symmetric about midspan); leftover sticks add more piers before deck lamination. Flat beams get none. Build order per bridge: deck -> 2 guaranteed piers -> existing structure (truss bracing / suspension towers + cables) -> extra piers -> deck lamination. A pier = fixed base node at the canyon floor (groundY), glued stick segments (strength bonus like towers) up to the deck node; the sim's glued-chain merge already turns each pier into one rigid column pinned to the deck at its top.
+
+### Task 28: Pier generator (TDD)
+
+**Files:**
+- Create: `src/game/bridge/pier.js` (`addPiers(model, rng, stickLen, deck, placed, maxCount)`)
+- Modify: `src/game/bridge/truss.js`, `src/game/bridge/suspension.js`
+- Test: `tests/generators.test.js`
+
+- [ ] **Step 1: Failing tests.** Truss and suspension at budget >= 60: `meta.piers >= 2`, at least 2 non-anchor fixed nodes at groundY, pier members glued, pier top = a deck node; budget 300 gives `meta.piers > 2`; flat has no fixed groundY nodes; tight budget (span 800 / budget 20 / stickLen 40) still valid + connected with deck complete; shared invariants (valid, connected, sticksUsed <= budget) keep passing with piers in the mix.
+- [ ] **Step 2: Implement.** pier.js: interior deck nodes sorted by |x - center|, skip nodes in `placed`, cost = ceil((groundY - node.y) / stickLen), build while budget allows up to maxCount, each segment glued with 3.5x strength bonus, base fixed at (node.x, groundY); meta.piers accumulates. truss/suspension: 2-pier call after deck, extras call after core structure, before lamination.
+- [ ] **Step 3: `npx vitest run` green.**
+- [ ] **Step 4: Commit** `feat: under-deck support piers for truss and suspension`
+
+### Task 29: Pier physics + visual gate
+
+**Files:**
+- Test: `tests/sim.test.js`
+
+- [ ] **Step 1: Failing test.** Truss budget 120: after settle, each pier's merged column body spans floor-to-deck (min vertex y within 30 of deckY, max vertex y within 10 of groundY), and the bridge still carries the human across.
+- [ ] **Step 2: Implement if needed** (glued-chain merge should already handle piers; fix whatever the test finds).
+- [ ] **Step 3: `npm test`, `npm run build`, `npm run e2e` green; visual screenshot check that piers render as columns under the deck.**
+- [ ] **Step 4: Commit** `test: pier columns stand and carry load` + final gate commit `chore: piers final gate`
