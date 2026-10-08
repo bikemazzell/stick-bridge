@@ -463,10 +463,10 @@ Three UX behaviors: (1) every cold start of the page randomizes the menu seed (U
 
 ### Task 22: Final gate (menu memory feature)
 
-- [ ] `npm test` green.
-- [ ] `npm run build` clean.
-- [ ] `npm run e2e` green (all scenarios incl. cold seed, speed, exit).
-- [ ] Tick all checkboxes above; commit `chore: menu memory final gate`
+- [x] `npm test` green.
+- [x] `npm run build` clean.
+- [x] `npm run e2e` green (all scenarios incl. cold seed, speed, exit).
+- [x] Tick all checkboxes above; commit `chore: menu memory final gate`
 
 ### Task 23: Fix suspension bridges collapsing upside down (bugfix, done before Tasks 18-22)
 
