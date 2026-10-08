@@ -447,10 +447,10 @@ Three UX behaviors: (1) every cold start of the page randomizes the menu seed (U
 - Modify: `src/ui/hud.js`, `src/style.css`
 - Test: `tests/ui.test.js`
 
-- [ ] **Step 1: Failing tests.** createHud renders `[data-action="speed"]` (label `1x`) and `[data-action="menu"]`; `setSpeed(8)` shows `8x`; clicking the buttons fires the onSpeed/onMenu callbacks passed to createHud(root, {onSpeed, onMenu}).
-- [ ] **Step 2: Implement.** Append two buttons to the pill row; setSpeed(n) writes `${n}x`; wire click listeners; style as HUD buttons.
-- [ ] **Step 3: `npx vitest run` green.**
-- [ ] **Step 4: Commit** `feat: hud speed and exit buttons`
+- [x] **Step 1: Failing tests.** createHud renders `[data-action="speed"]` (label `1x`) and `[data-action="menu"]`; `setSpeed(8)` shows `8x`; clicking the buttons fires the onSpeed/onMenu callbacks passed to createHud(root, {onSpeed, onMenu}).
+- [x] **Step 2: Implement.** Append two buttons to the pill row; setSpeed(n) writes `${n}x`; wire click listeners; style as HUD buttons.
+- [x] **Step 3: `npx vitest run` green.**
+- [x] **Step 4: Commit** `feat: hud speed and exit buttons`
 
 ### Task 21: Main wiring + e2e
 

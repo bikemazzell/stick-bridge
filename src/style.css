@@ -165,6 +165,18 @@ html, body {
   white-space: nowrap;
 }
 
+.pill-btn {
+  pointer-events: auto;
+  cursor: pointer;
+  font-family: inherit;
+  background: rgba(24, 34, 56, 0.85);
+}
+
+.pill-btn:hover {
+  border-color: #ffd166;
+  color: #ffd166;
+}
+
 /* ---------- result ---------- */
 .result {
   background: rgba(10, 14, 26, 0.62);

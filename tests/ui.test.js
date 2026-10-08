@@ -138,6 +138,30 @@ describe('hud', () => {
     hud.setWalker(tank, 9, 10);
     expect(document.querySelector('[data-hud="walker"]').textContent).toContain('42t');
   });
+
+  it('renders speed and exit buttons that fire callbacks', () => {
+    const calls = [];
+    const hud = createHud(document.body, {
+      onSpeed: () => calls.push('speed'),
+      onMenu: () => calls.push('menu'),
+    });
+    const speedBtn = document.querySelector('[data-action="speed"]');
+    const menuBtn = document.querySelector('[data-action="menu"]');
+    expect(speedBtn).toBeTruthy();
+    expect(menuBtn).toBeTruthy();
+    expect(speedBtn.textContent).toBe('1x');
+    click(speedBtn);
+    click(menuBtn);
+    expect(calls).toEqual(['speed', 'menu']);
+  });
+
+  it('setSpeed updates the speed button label', () => {
+    const hud = createHud(document.body);
+    hud.setSpeed(8);
+    expect(document.querySelector('[data-action="speed"]').textContent).toBe('8x');
+    hud.setSpeed(16);
+    expect(document.querySelector('[data-action="speed"]').textContent).toBe('16x');
+  });
 });
 
 describe('result', () => {
