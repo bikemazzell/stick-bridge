@@ -27,13 +27,15 @@ export function buildSuspension(model, rng, stickLen) {
     for (let s = 1; s <= segs; s++) {
       const y = base.y - (towerHeight * s) / segs;
       const top = s === segs ? addNode(model, base.x, towerTopY) : addNode(model, base.x, y);
-      addMember(model, prev.id, top.id, 'stick', strengthFor(rng, "stick") * 3.5);
+      const seg = addMember(model, prev.id, top.id, 'stick', strengthFor(rng, "stick") * 3.5);
+      seg.glued = true; // towers are glued stacks, not pinned chains
       prev = top;
     }
     return { x: base.x, top: prev };
   });
 
-  const sag = rng.range(40, 80);
+  // the main cable must stay above the deck even on budget-shortened towers
+  const sag = Math.min(rng.range(40, 80), Math.max(10, towerHeight - 20));
   const [t0, t1] = towers;
   const cx = (t0.x + t1.x) / 2;
   const half = (t1.x - t0.x) / 2;

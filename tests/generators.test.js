@@ -215,6 +215,25 @@ describe('variable span', () => {
     expect(validate(model)).toEqual([]);
     expect(isConnected(model)).toBe(true);
   });
+
+  it('never places cable geometry below the deck, even on short towers', () => {
+    for (const budget of [22, 24, 26, 30, 60]) {
+      for (const stickLen of [40, 45]) {
+        for (const seed of ['a', 'b', 'c']) {
+          const model = generateBridge({ type: 'suspension', seed, budget, stickLen, span: 800 });
+          const byId = new Map(model.nodes.map((n) => [n.id, n]));
+          for (const m of model.members) {
+            if (m.material !== 'cable') continue;
+            for (const id of [m.a, m.b]) {
+              const n = byId.get(id);
+              if (Math.abs(n.y - deckY) <= 5) continue; // deck endpoints sit on the deck line
+              expect(n.y, `budget=${budget} stickLen=${stickLen} seed=${seed} node ${id}`).toBeLessThan(deckY);
+            }
+          }
+        }
+      }
+    }
+  });
 });
 
 describe('strength scatter', () => {

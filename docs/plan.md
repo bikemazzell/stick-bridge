@@ -467,3 +467,14 @@ Three UX behaviors: (1) every cold start of the page randomizes the menu seed (U
 - [ ] `npm run build` clean.
 - [ ] `npm run e2e` green (all scenarios incl. cold seed, speed, exit).
 - [ ] Tick all checkboxes above; commit `chore: menu memory final gate`
+
+### Task 23: Fix suspension bridges collapsing upside down (bugfix, done before Tasks 18-22)
+
+**Bug:** every suspension bridge rendered with the cable system hanging below the deck. Root causes: (1) the sim modeled tower stacks as pin-jointed segment chains, which buckle during settle (tower tops rotated ~140 degrees and fell to y~540), dragging the main cable and hangers under the deck; (2) generator edge case: `sag` (40-80) could exceed the budget-clamped `towerHeight` (min 40) on tight budgets, placing main-cable nodes below the deck line in the model itself.
+
+**Fix (TDD):** failing tests first - sim test asserts tower bodies reach model height (+-25 px) and all cable clamps stay above deckY after settle for seeds sus/e2e-susp/x2; generator test sweeps budget 22-60 x stickLen 40-45 x span 800 asserting no cable-incident node sits below the deck line. Then: suspension.js marks tower members `glued: true` and clamps `sag = min(rng(40,80), max(10, towerHeight - 20))`; sim.js merges each glued chain into ONE rigid column body (registerGroup/bodyOpts refactor; parallel laminate grouping skips chain members) - a glued popsicle stack is a solid column, and pin+weld constraint pairs were still solver-soft under cable load (148 px lean). Weld world anchors at fixed tower bases remain as the base attachment.
+
+- [x] Failing tests written and confirmed failing (tower top off by 311 px pre-fix; cable below deck in 6/480 generator combos).
+- [x] `npx vitest run` green (175/175).
+- [x] `npm run e2e` green; suspension.png vision check: towers above deck, cable arcs over towers sagging above deck, hangers visible, nothing below deck.
+- [x] Commit `fix: suspension towers buckle and cables hang below deck`

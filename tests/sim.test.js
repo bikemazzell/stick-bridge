@@ -146,4 +146,33 @@ describe('physics simulation', () => {
     expect(sim.walkerCrossed()).toBe(false);
     expect(sim.walkerFell()).toBe(false);
   });
+
+  it('suspension towers stand and the main cable stays above the deck', () => {
+    for (const seed of ['sus', 'e2e-susp', 'x2']) {
+      const model = generateBridge({ type: 'suspension', seed, budget: 100, stickLen: 80 });
+      const sim = createSim(model);
+      sim.spawnWalker(byId('fly'));
+
+      const towerTopY = deckY - model.meta.towerHeight;
+      const tops = model.nodes.filter((n) => Math.abs(n.y - towerTopY) < 1);
+      expect(tops.length, `tower tops for seed ${seed}`).toBeGreaterThanOrEqual(2);
+      for (const t of tops) {
+        const m = model.members.find((mm) => mm.material === 'stick' && (mm.a === t.id || mm.b === t.id));
+        const body = sim.bodies.get(m.id);
+        const ys = body.vertices.map((v) => v.y);
+        const xs = body.vertices.map((v) => v.x);
+        expect(Math.min(...xs), `tower top x for seed ${seed}`).toBeGreaterThan(t.x - 25);
+        expect(Math.max(...xs), `tower top x for seed ${seed}`).toBeLessThan(t.x + 25);
+        expect(Math.min(...ys), `tower top y for seed ${seed}`).toBeGreaterThan(towerTopY - 25);
+        expect(Math.min(...ys), `tower top reaches model height for seed ${seed}`).toBeLessThan(towerTopY + 25);
+      }
+
+      let below = 0;
+      for (const [id, b] of sim.nodeBodies) {
+        const n = model.nodes[id];
+        if (n && n.y < deckY - 5 && b && b.position.y > deckY) below++;
+      }
+      expect(below, `cable clamps below deck for seed ${seed}`).toBe(0);
+    }
+  });
 });
