@@ -12,11 +12,13 @@ import { createHud } from './ui/hud.js';
 import { createResult } from './ui/result.js';
 
 const BUILD_TICKS = 60;
+const SPEEDS = [1, 4, 8, 16];
 
 const canvas = document.getElementById('game');
 const app = document.getElementById('app');
 const renderer = createRenderer(canvas);
-const { cfg: cfgOverride, speed } = parseParams(window.location.search);
+const { cfg: cfgOverride, speed: initialSpeed } = parseParams(window.location.search);
+let speed = initialSpeed;
 
 let gs = createGameState();
 let model = null;
@@ -53,9 +55,29 @@ function beginRound(full) {
   menu = null;
   if (hud) hud.destroy();
   if (result) result.hide();
-  hud = createHud(app);
+  hud = createHud(app, { onSpeed: cycleSpeed, onMenu: exitToMenu });
+  hud.setSpeed(speed);
   hud.setSeed(full.seed);
   hud.setSticks(sticksUsed(model), full.budget);
+}
+
+function cycleSpeed() {
+  speed = SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length];
+  hud.setSpeed(speed);
+}
+
+function exitToMenu() {
+  if (gs.state !== 'building' && gs.state !== 'testing') return;
+  const prev = gs.config ? { ...gs.config } : null;
+  gs = transition(gs, 'EXIT');
+  sim = null;
+  ctl = null;
+  model = null;
+  cameraShake = null;
+  if (hud) hud.destroy();
+  hud = null;
+  if (result) result.hide();
+  menu = createMenu(app, startRound, prev);
 }
 
 function startRound(cfg) {
@@ -116,6 +138,7 @@ function onReplay() {
 }
 
 function onNew() {
+  const prev = gs.config ? { ...gs.config } : null;
   result.hide();
   result.destroy();
   result = null;
@@ -125,7 +148,7 @@ function onNew() {
   sim = null;
   ctl = null;
   model = null;
-  menu = createMenu(app, startRound);
+  menu = createMenu(app, startRound, prev);
 }
 
 function step() {

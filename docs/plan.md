@@ -457,9 +457,9 @@ Three UX behaviors: (1) every cold start of the page randomizes the menu seed (U
 **Files:**
 - Modify: `src/main.js`, `e2e/run.mjs`
 
-- [ ] **Step 1: Implement.** main.js: `let speed` (was const); SPEEDS = [1,4,8,16]; hud created with onSpeed (cycle, hud.setSpeed) and onMenu (exitToMenu: keep gs.config copy, destroy hud/result, transition EXIT, null sim/ctl/model, createMenu(app, startRound, prevConfig)); onNew passes previous config to createMenu the same way; hud.setSpeed(speed) after creation.
-- [ ] **Step 2: E2e S8 (cold seed):** two fresh page loads produce different menu seeds matching the pattern. **S9 (speed + exit):** `?seed=e2e-exit&type=flat&budget=40&speed=1`, click speed button -> `4x`, click menu -> menu screen visible with seed `e2e-exit`, budget `40`, flat card selected; Start -> testing again. `npm run e2e` green.
-- [ ] **Step 3: Commit** `feat: in-game speed and exit wiring with e2e`
+- [x] **Step 1: Implement.** main.js: `let speed` (was const); SPEEDS = [1,4,8,16]; hud created with onSpeed (cycle, hud.setSpeed) and onMenu (exitToMenu: keep gs.config copy, destroy hud/result, transition EXIT, null sim/ctl/model, createMenu(app, startRound, prevConfig)); onNew passes previous config to createMenu the same way; hud.setSpeed(speed) after creation.
+- [x] **Step 2: E2e S8 (cold seed):** two fresh page loads produce different menu seeds matching the pattern. **S9 (speed + exit):** `?seed=e2e-exit&type=flat&budget=40&speed=1`, click speed button -> `4x`, click menu -> menu screen visible with seed `e2e-exit`, budget `40`, flat card selected; Start -> testing again. `npm run e2e` green.
+- [x] **Step 3: Commit** `feat: in-game speed and exit wiring with e2e`
 
 ### Task 22: Final gate (menu memory feature)
 

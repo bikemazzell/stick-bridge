@@ -224,6 +224,51 @@ async function run() {
     await page.close();
   }
 
+  // S8: cold start randomizes the menu seed
+  {
+    console.log('S8: cold seed random');
+    const seeds = [];
+    for (let i = 0; i < 2; i++) {
+      const { page, errors } = await newPage(browser, `S8-${i}`);
+      await page.goto(BASE + '/', { waitUntil: 'load' });
+      await page.waitForSelector('[data-screen="menu"]', { timeout: 10000 });
+      const seed = await page.evaluate(() => document.querySelector('[data-input="seed"]').value);
+      seeds.push(seed);
+      check(`S8 seed pattern load ${i}`, /^[a-z]+-\d{3}$/.test(seed), seed);
+      check(`S8 no console errors load ${i}`, errors.length === 0, errors.join(' | '));
+      await page.close();
+    }
+    check('S8 seeds differ across cold starts', seeds[0] !== seeds[1], seeds.join(' | '));
+  }
+
+  // S9: speed button cycles and exit returns to menu with previous values
+  {
+    console.log('S9: speed cycle and exit to menu');
+    const { page, errors } = await newPage(browser, 'S9');
+    await page.goto(BASE + '/?seed=e2e-exit&type=flat&budget=40&speed=1', { waitUntil: 'load' });
+    await waitState(page, (s) => s.state === 'testing', 30000, 'testing');
+    await page.click('[data-action="speed"]');
+    const label = await page.evaluate(() => document.querySelector('[data-action="speed"]').textContent);
+    check('S9 speed cycles to 4x', label === '4x', label);
+    await page.click('[data-action="menu"]');
+    await page.waitForSelector('[data-screen="menu"]', { timeout: 10000 });
+    const kept = await page.evaluate(() => ({
+      seed: document.querySelector('[data-input="seed"]').value,
+      budget: document.querySelector('[data-input="budget"]').value,
+      type: document.querySelector('.card.selected').dataset.type,
+    }));
+    check('S9 menu keeps seed', kept.seed === 'e2e-exit', kept.seed);
+    check('S9 menu keeps budget', kept.budget === '40', kept.budget);
+    check('S9 menu keeps type', kept.type === 'flat', kept.type);
+    const state = await page.evaluate(() => window.__game.getState().state);
+    check('S9 state is menu', state === 'menu', state);
+    await page.click('[data-action="start"]');
+    const st = await waitState(page, (s) => s.state === 'testing', 30000, 'testing after restart');
+    check('S9 restart from kept config', st.config.seed === 'e2e-exit' && st.config.type === 'flat');
+    check('S9 no console errors', errors.length === 0, errors.join(' | '));
+    await page.close();
+  }
+
   // S6: day/night cycle changes pixels
   {
     console.log('S6: day/night differs');
