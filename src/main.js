@@ -170,6 +170,7 @@ function render() {
     cameraShake,
     buildProgress: gs.state === 'building' ? buildTick / BUILD_TICKS : null,
     seed: gs.config ? gs.config.seed : 'default',
+    span: gs.config ? gs.config.span : DEFAULTS.span,
   });
 }
 

@@ -1,17 +1,16 @@
 import { makeRng, rngHelpers } from '../game/rng.js';
-import { WORLD } from '../game/config.js';
+import { worldFor } from '../game/config.js';
 import { shade } from './sky.js';
 
-const { gapX0, gapX1, deckY, groundY } = WORLD;
-
-export function createScenery(seed = 'scenery') {
+export function createScenery(seed = 'scenery', span) {
+  const g = worldFor(span);
   const rng = rngHelpers(makeRng(`${seed}:scenery`));
   const trees = [];
   for (let i = 0; i < 4; i++) {
-    trees.push({ x: rng.range(60, gapX0 - 60), h: rng.range(40, 80), w: rng.range(14, 26), tone: rng.pick([0, 1]) });
+    trees.push({ x: rng.range(60, g.gapX0 - 60), h: rng.range(40, 80), w: rng.range(14, 26), tone: rng.pick([0, 1]) });
   }
   for (let i = 0; i < 4; i++) {
-    trees.push({ x: rng.range(gapX1 + 60, WORLD.width - 60), h: rng.range(40, 80), w: rng.range(14, 26), tone: rng.pick([0, 1]) });
+    trees.push({ x: rng.range(g.gapX1 + 60, g.width - 60), h: rng.range(40, 80), w: rng.range(14, 26), tone: rng.pick([0, 1]) });
   }
   const wallJags = { left: [], right: [] };
   for (let i = 0; i < 6; i++) {
@@ -22,7 +21,7 @@ export function createScenery(seed = 'scenery') {
   for (let i = 0; i < 7; i++) {
     riverSticks.push({ x: rng.range(0, 200), y: rng.range(4, 12), w: rng.range(20, 60), v: rng.range(0.2, 0.6) });
   }
-  return { trees, wallJags, riverSticks };
+  return { span: g.gapX1 - g.gapX0, trees, wallJags, riverSticks };
 }
 
 function poly(ctx, points) {
@@ -33,7 +32,7 @@ function poly(ctx, points) {
   ctx.fill();
 }
 
-function drawTree(ctx, tree, light) {
+function drawTree(ctx, tree, deckY, light) {
   const { x, h, w, tone } = tree;
   ctx.fillStyle = shade('#6d4c33', light);
   ctx.fillRect(x - 2, deckY - h * 0.3, 4, h * 0.3);
@@ -51,6 +50,9 @@ function drawTree(ctx, tree, light) {
 }
 
 export function drawScenery(ctx, scenery, tick, light) {
+  const { width, gapX0, gapX1, deckY, groundY } = worldFor(scenery.span);
+  const cx = (gapX0 + gapX1) / 2;
+  const half = (gapX1 - gapX0) / 2;
   const far = shade('#b08d7a', light);
   const mid = shade('#9a7a6a', light);
   const rock = shade('#5d4037', light);
@@ -60,13 +62,13 @@ export function drawScenery(ctx, scenery, tick, light) {
   ctx.fillStyle = far;
   ctx.globalAlpha = 0.55;
   poly(ctx, [
-    [gapX0 - 30, 560], [gapX0 + 90, 505], [gapX0 + 220, 545], [640, 495],
+    [gapX0 - 30, 560], [gapX0 + 90, 505], [gapX0 + 220, 545], [cx, 495],
     [gapX1 - 220, 545], [gapX1 - 90, 505], [gapX1 + 30, 560], [gapX1 + 30, groundY + 20], [gapX0 - 30, groundY + 20],
   ]);
   ctx.globalAlpha = 0.8;
   ctx.fillStyle = mid;
   poly(ctx, [
-    [gapX0 - 20, 600], [gapX0 + 130, 560], [400, 585], [640, 555], [880, 585], [gapX1 - 130, 560], [gapX1 + 20, 600],
+    [gapX0 - 20, 600], [gapX0 + 130, 560], [cx - half * 0.75, 585], [cx, 555], [cx + half * 0.75, 585], [gapX1 - 130, 560], [gapX1 + 20, 600],
     [gapX1 + 20, groundY + 20], [gapX0 - 20, groundY + 20],
   ]);
   ctx.globalAlpha = 1;
@@ -82,17 +84,17 @@ export function drawScenery(ctx, scenery, tick, light) {
   ctx.fillStyle = rock;
   poly(ctx, leftPts);
 
-  const rightPts = [[WORLD.width, deckY], [gapX1, deckY]];
+  const rightPts = [[width, deckY], [gapX1, deckY]];
   scenery.wallJags.right.forEach((j, i) => {
     rightPts.push([gapX1 + j, ly0 + step * (i + 1)]);
   });
-  rightPts.push([WORLD.width, ly1]);
+  rightPts.push([width, ly1]);
   ctx.fillStyle = rock;
   poly(ctx, rightPts);
 
   // darker base band
   ctx.fillStyle = rockDark;
-  ctx.fillRect(0, groundY - 6, WORLD.width, 26);
+  ctx.fillRect(0, groundY - 6, width, 26);
 
   // river shimmering at the canyon floor
   ctx.fillStyle = shade('#4a90d9', light);
@@ -106,7 +108,7 @@ export function drawScenery(ctx, scenery, tick, light) {
   // grass on the cliff tops
   ctx.fillStyle = shade('#6ab04c', light);
   ctx.fillRect(0, deckY - 5, gapX0, 7);
-  ctx.fillRect(gapX1, deckY - 5, WORLD.width - gapX1, 7);
+  ctx.fillRect(gapX1, deckY - 5, width - gapX1, 7);
 
-  for (const t of scenery.trees) drawTree(ctx, t, light);
+  for (const t of scenery.trees) drawTree(ctx, t, deckY, light);
 }

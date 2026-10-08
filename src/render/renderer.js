@@ -1,5 +1,5 @@
 import { makeRng, rngHelpers } from '../game/rng.js';
-import { WORLD } from '../game/config.js';
+import { SPAN } from '../game/config.js';
 import { skyState, celestial, starField, drawSky, drawCelestial, drawStars, lerpColor } from './sky.js';
 import { createWeather, drawWeather, weatherLabel } from './weather.js';
 import { createScenery, drawScenery } from './scenery.js';
@@ -19,16 +19,18 @@ function stressColor(ratio) {
 export function createRenderer(canvas) {
   const ctx = canvas.getContext('2d');
   let seed = null;
+  let span = null;
   let weather = null;
   let scenery = null;
   let stars = null;
   let dust = [];
 
-  function ensureAssets(newSeed) {
-    if (newSeed === seed) return;
+  function ensureAssets(newSeed, newSpan) {
+    if (newSeed === seed && newSpan === span) return;
     seed = newSeed;
+    span = newSpan;
     weather = createWeather(String(seed));
-    scenery = createScenery(String(seed));
+    scenery = createScenery(String(seed), newSpan);
     stars = starField(String(seed));
     dust = [];
   }
@@ -181,8 +183,8 @@ export function createRenderer(canvas) {
   }
 
   function draw(frameState) {
-    const { sim, model, tickCount, walkers = [], cameraShake = null, buildProgress = null, seed: frameSeed = 'default' } = frameState;
-    ensureAssets(frameSeed);
+    const { sim, model, tickCount, walkers = [], cameraShake = null, buildProgress = null, seed: frameSeed = 'default', span: frameSpan = SPAN.default } = frameState;
+    ensureAssets(frameSeed, frameSpan);
     const state = skyState(tickCount);
 
     drawSky(ctx, state);

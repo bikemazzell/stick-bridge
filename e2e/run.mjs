@@ -206,6 +206,24 @@ async function run() {
     await page.close();
   }
 
+  // S7: custom span reaches testing and reports the span
+  {
+    console.log('S7: span 800 round');
+    const { page, errors } = await newPage(browser, 'S7');
+    await page.goto(BASE + '/?seed=e2e-span&type=truss&budget=200&span=800&speed=4', { waitUntil: 'load' });
+    await waitState(page, (s) => s.state === 'testing', 30000, 'testing at span 800');
+    const cfg = await page.evaluate(() => window.__game.getConfig());
+    check('S7 config span 800', cfg && cfg.span === 800, JSON.stringify(cfg));
+    const sticks = await page.evaluate(() => {
+      const el = document.querySelector('[data-hud="sticks"]');
+      return el ? el.textContent : '';
+    });
+    check('S7 sticks format', /^\d+\/\d+ sticks$/.test(sticks) && !sticks.includes('undefined'), sticks);
+    check('S7 no console errors', errors.length === 0, errors.join(' | '));
+    await page.screenshot({ path: path.join(SHOTS, 'span.png') });
+    await page.close();
+  }
+
   // S6: day/night cycle changes pixels
   {
     console.log('S6: day/night differs');

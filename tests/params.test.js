@@ -9,8 +9,8 @@ describe('parseParams', () => {
   });
 
   it('parses all round params', () => {
-    const { cfg, speed } = parseParams('?seed=e2e-flat&type=flat&budget=30&stickLen=60&speed=4');
-    expect(cfg).toEqual({ seed: 'e2e-flat', type: 'flat', budget: 30, stickLen: 60 });
+    const { cfg, speed } = parseParams('?seed=e2e-flat&type=flat&budget=30&stickLen=60&span=800&speed=4');
+    expect(cfg).toEqual({ seed: 'e2e-flat', type: 'flat', budget: 30, stickLen: 60, span: 800 });
     expect(speed).toBe(4);
   });
 

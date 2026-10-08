@@ -12,7 +12,7 @@ export function parseParams(search) {
     cfg.type = type;
     hasCfg = true;
   }
-  for (const key of ['budget', 'stickLen']) {
+  for (const key of ['budget', 'stickLen', 'span']) {
     const raw = q.get(key);
     if (raw !== null && raw !== '' && Number.isFinite(Number(raw))) {
       cfg[key] = Number(raw);

@@ -400,11 +400,11 @@ Budget safety: at span max 800 and stickLen min 40 the deck needs ceil(800/40) =
 - Modify: `src/render/scenery.js`, `src/render/renderer.js`, `src/ui/menu.js`, `src/game/params.js`, `src/main.js`, `e2e/run.mjs`
 - Test: `tests/render.test.js`, `tests/ui.test.js`, `tests/params.test.js`
 
-- [ ] **Step 1: Failing tests.** Scenery: `createScenery(seed, 800)` trees all inside the new cliffs; renderer/menu/params: span slider exists with default, `onStart` payload includes span, `parseParams` reads `span`.
-- [ ] **Step 2: Implement.** scenery.js: `createScenery(seed, span)` stores span, `drawScenery` uses `worldFor(scenery.span)` (backdrop midpoints center-relative). renderer.js: `ensureAssets(seed, span)` resets on span change. menu.js: slider 480-800 step 20 + payload. params.js: `span` numeric key. main.js: pass `span` in draw frameState.
-- [ ] **Step 3: `npx vitest run` green.**
-- [ ] **Step 4: E2e scenario S7:** `?seed=e2e-span&type=truss&budget=200&span=800&speed=4` reaches testing, `getConfig().span === 800`, screenshot `span.png`; run `npm run e2e` green.
-- [ ] **Step 5: Commit** `feat: span setting in scenery, menu and e2e`
+- [x] **Step 1: Failing tests.** Scenery: `createScenery(seed, 800)` trees all inside the new cliffs; renderer/menu/params: span slider exists with default, `onStart` payload includes span, `parseParams` reads `span`.
+- [x] **Step 2: Implement.** scenery.js: `createScenery(seed, span)` stores span, `drawScenery` uses `worldFor(scenery.span)` (backdrop midpoints center-relative). renderer.js: `ensureAssets(seed, span)` resets on span change. menu.js: slider 480-800 step 20 + payload. params.js: `span` numeric key. main.js: pass `span` in draw frameState.
+- [x] **Step 3: `npx vitest run` green.**
+- [x] **Step 4: E2e scenario S7:** `?seed=e2e-span&type=truss&budget=200&span=800&speed=4` reaches testing, `getConfig().span === 800`, screenshot `span.png`; run `npm run e2e` green.
+- [x] **Step 5: Commit** `feat: span setting in scenery, menu and e2e`
 
 ### Task 17: Final gate (span feature)
 

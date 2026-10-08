@@ -26,6 +26,10 @@ export function createMenu(root, onStart) {
         <span>Stick length: <b data-out="stickLen">${DEFAULTS.stickLen}</b></span>
         <input data-input="stickLen" type="range" min="40" max="120" step="5" value="${DEFAULTS.stickLen}">
       </label>
+      <label class="ctrl">
+        <span>Canyon span: <b data-out="span">${DEFAULTS.span}</b></span>
+        <input data-input="span" type="range" min="480" max="800" step="20" value="${DEFAULTS.span}">
+      </label>
       <label class="ctrl seedrow">
         <span>Seed</span>
         <input data-input="seed" type="text" value="pop-1" maxlength="24">
@@ -60,14 +64,17 @@ export function createMenu(root, onStart) {
 
   const budget = el.querySelector('[data-input="budget"]');
   const stickLen = el.querySelector('[data-input="stickLen"]');
+  const span = el.querySelector('[data-input="span"]');
   const seed = el.querySelector('[data-input="seed"]');
   const budgetOut = el.querySelector('[data-out="budget"]');
   const stickLenOut = el.querySelector('[data-out="stickLen"]');
+  const spanOut = el.querySelector('[data-out="span"]');
   const hint = el.querySelector('[data-out="hint"]');
   const dice = el.querySelector('[data-action="dice"]');
 
   budget.addEventListener('input', () => { budgetOut.textContent = budget.value; });
   stickLen.addEventListener('input', () => { stickLenOut.textContent = stickLen.value; });
+  span.addEventListener('input', () => { spanOut.textContent = span.value; });
   dice.addEventListener('click', () => {
     const w = SEED_WORDS[Math.floor(Math.random() * SEED_WORDS.length)];
     seed.value = `${w}-${Math.floor(Math.random() * 900 + 100)}`;
@@ -87,6 +94,7 @@ export function createMenu(root, onStart) {
       seed: seed.value || 'pop-1',
       budget: parseInt(budget.value, 10),
       stickLen: parseInt(stickLen.value, 10),
+      span: parseInt(span.value, 10),
     });
   });
 

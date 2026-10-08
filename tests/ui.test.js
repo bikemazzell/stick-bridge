@@ -25,6 +25,7 @@ describe('menu', () => {
     expect(document.querySelector('.card[data-type="truss"]').classList.contains('selected')).toBe(true);
     expect(document.querySelector('[data-input="budget"]').value).toBe(String(DEFAULTS.budget));
     expect(document.querySelector('[data-input="stickLen"]').value).toBe(String(DEFAULTS.stickLen));
+    expect(document.querySelector('[data-input="span"]').value).toBe(String(DEFAULTS.span));
   });
 
   it('selecting a card and pressing start emits that config', () => {
@@ -34,8 +35,9 @@ describe('menu', () => {
     document.querySelector('[data-input="seed"]').value = 'abc';
     document.querySelector('[data-input="budget"]').value = '200';
     document.querySelector('[data-input="stickLen"]').value = '100';
+    document.querySelector('[data-input="span"]').value = '800';
     click(document.querySelector('[data-action="start"]'));
-    expect(got).toEqual([{ type: 'suspension', seed: 'abc', budget: 200, stickLen: 100 }]);
+    expect(got).toEqual([{ type: 'suspension', seed: 'abc', budget: 200, stickLen: 100, span: 800 }]);
   });
 
   it('slider outputs update live', () => {

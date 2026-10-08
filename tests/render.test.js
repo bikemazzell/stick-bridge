@@ -4,7 +4,7 @@ import { createWeather, weatherLabel } from '../src/render/weather.js';
 import { createScenery } from '../src/render/scenery.js';
 import { CHAR_DRAWERS, drawWalker } from '../src/render/characters.js';
 import { createRenderer } from '../src/render/renderer.js';
-import { LADDER } from '../src/game/config.js';
+import { LADDER, worldFor } from '../src/game/config.js';
 import { generateBridge } from '../src/game/bridge/generator.js';
 import { createSim } from '../src/game/physics/sim.js';
 
@@ -92,6 +92,20 @@ describe('scenery', () => {
     const a = createScenery('s1');
     expect(a.trees.length).toBe(8);
     expect(a).toEqual(createScenery('s1'));
+  });
+
+  it('places trees inside the cliffs of a custom span', () => {
+    for (const span of [480, 800]) {
+      const g = worldFor(span);
+      const s = createScenery('s1', span);
+      expect(s.span).toBe(span);
+      expect(s.trees.length).toBe(8);
+      for (const t of s.trees) {
+        const onLeft = t.x > 40 && t.x < g.gapX0 - 30;
+        const onRight = t.x > g.gapX1 + 30 && t.x < g.width - 40;
+        expect(onLeft || onRight, `tree at ${t.x} near a cliff for span ${span}`).toBe(true);
+      }
+    }
   });
 });
 
