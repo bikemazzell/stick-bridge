@@ -534,7 +534,22 @@ Notes: a genuinely-stuck round needed the exit hooks wired in the probe (fly cro
 
 Truss and suspension bridges get at least two glued support columns (piers) standing on the canyon floor under interior deck nodes when the budget allows, placed center-out (so the minimum pair sits symmetric about midspan); leftover sticks add more piers before deck lamination. Flat beams get none. Build order per bridge: deck -> 2 guaranteed piers -> existing structure (truss bracing / suspension towers + cables) -> extra piers -> deck lamination. A pier = fixed base node at the canyon floor (groundY), glued stick segments (strength bonus like towers) up to the deck node; the sim's glued-chain merge already turns each pier into one rigid column pinned to the deck at its top.
 
-### Task 28: Pier generator (TDD)
+### Task 28: Clamp deck ends (fix end-of-deck kink trapping walkers)
+
+**Bug (user-reported):** the deck is only pinned at the cliff anchors, so a heavy walker kinks the deck sharply at the FIRST and LAST connection. At the far end the walker faces an unclimbable up-slope and strands just short of the cliff (seen live: elephant stuck at x~940 with a rant bubble, gapX1=960).
+
+**Fix (TDD):** weld the deck laminate groups at fixed anchor nodes to the world (pin at the node + offset world anchor along the panel), mirroring the tower base weld. Deck ends leave the cliff horizontally, like a glued popsicle abutment.
+
+**Files:**
+- Modify: `src/game/physics/sim.js`
+- Test: `tests/sim.test.js`
+
+- [ ] **Step 1: Failing test.** Flat budget 300 deck, human parked near the far anchor: after 400 ticks the first and last deck panels stay near level (|sin(body.angle)| < 0.2 each).
+- [ ] **Step 2: Implement.** In the fixed-node joint loop, weld when the group is glued OR is a deck body.
+- [ ] **Step 3: `npx vitest run` green (all existing break/stuck tests unchanged).**
+- [ ] **Step 4: Probe the formerly-stuck round (suspension/300/120 seed stuck-0, elephant walker 8): expect it to cross now; add a regression test if it does. Commit** `fix: clamp deck ends so heavy walkers can climb off the bridge`
+
+### Task 29: Pier generator (TDD)
 
 **Files:**
 - Create: `src/game/bridge/pier.js` (`addPiers(model, rng, stickLen, deck, placed, maxCount)`)
@@ -546,7 +561,7 @@ Truss and suspension bridges get at least two glued support columns (piers) stan
 - [ ] **Step 3: `npx vitest run` green.**
 - [ ] **Step 4: Commit** `feat: under-deck support piers for truss and suspension`
 
-### Task 29: Pier physics + visual gate
+### Task 30: Pier physics + visual gate
 
 **Files:**
 - Test: `tests/sim.test.js`
