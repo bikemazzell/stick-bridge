@@ -101,6 +101,25 @@ describe('game state machine', () => {
     expect(gs.config).toBe(null);
   });
 
+  it('EXIT abandons a round from building or testing back to a fresh menu', () => {
+    const fromBuilding = transition(started(), 'EXIT');
+    expect(fromBuilding).toEqual(createGameState());
+
+    let gs = transition(started(), 'BUILT');
+    gs = transition(gs, 'WALKER_EXIT', { name: 'cat', massKg: 4 });
+    gs = transition(gs, 'BROKE', { memberId: 2 });
+    const fromTesting = transition(gs, 'EXIT');
+    expect(fromTesting).toEqual(createGameState());
+  });
+
+  it('EXIT is ignored in menu and result states', () => {
+    const menu = createGameState();
+    expect(transition(menu, 'EXIT')).toBe(menu);
+    let gs = transition(started(), 'BUILT');
+    gs = transition(gs, 'DONE');
+    expect(transition(gs, 'EXIT')).toBe(gs);
+  });
+
   it('REPLAY resets round tracking but keeps heaviest of the session? no: resets it', () => {
     let gs = transition(started(), 'BUILT');
     gs = transition(gs, 'WALKER_EXIT', { name: 'cat', massKg: 4 });

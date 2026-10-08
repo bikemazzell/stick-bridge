@@ -41,6 +41,7 @@ export function transition(gs, event, payload) {
     },
     building: {
       BUILT: (g) => ({ ...g, state: 'testing', fact: pickFact(g.config) }),
+      EXIT: () => createGameState(),
     },
     testing: {
       WALKER_EXIT: (g) => {
@@ -64,6 +65,7 @@ export function transition(gs, event, payload) {
         state: 'result',
         resultReason: payload && payload.reason ? payload.reason : 'survived',
       }),
+      EXIT: () => createGameState(),
     },
     result: {
       REPLAY: (g) => ({ ...freshRound(g), state: 'building', config: g.config, fact: pickFact(g.config) }),

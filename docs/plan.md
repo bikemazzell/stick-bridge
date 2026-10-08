@@ -425,10 +425,10 @@ Three UX behaviors: (1) every cold start of the page randomizes the menu seed (U
 - Modify: `src/game/state.js`
 - Test: `tests/state.test.js`
 
-- [ ] **Step 1: Failing tests.** EXIT from building and from testing returns a fresh menu state (createGameState equal); EXIT in menu/result state is ignored (same object returned).
-- [ ] **Step 2: Implement.** Add `EXIT: () => createGameState()` to the building and testing handler maps.
-- [ ] **Step 3: `npx vitest run` green.**
-- [ ] **Step 4: Commit** `feat: fsm exit event`
+- [x] **Step 1: Failing tests.** EXIT from building and from testing returns a fresh menu state (createGameState equal); EXIT in menu/result state is ignored (same object returned).
+- [x] **Step 2: Implement.** Add `EXIT: () => createGameState()` to the building and testing handler maps.
+- [x] **Step 3: `npx vitest run` green.**
+- [x] **Step 4: Commit** `feat: fsm exit event`
 
 ### Task 19: Menu cold-start random seed + prefill
 
