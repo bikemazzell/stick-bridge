@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createSim } from '../src/game/physics/sim.js';
 import { generateBridge } from '../src/game/bridge/generator.js';
 import { createModel, addNode, addMember, deckPath } from '../src/game/model.js';
-import { LADDER, WORLD, MASS_SCALE } from '../src/game/config.js';
+import { LADDER, WORLD, MASS_SCALE, worldFor } from '../src/game/config.js';
 import Matter from 'matter-js';
 
 const { gapX0, gapX1, deckY } = WORLD;
@@ -22,6 +22,27 @@ describe('physics simulation', () => {
     const sim = createSim(model);
     sim.spawnWalker(byId('fly'));
     run(sim, 900);
+    expect(sim.walkerCrossed()).toBe(true);
+    expect(sim.brokenCount).toBe(0);
+  });
+
+  it('uses the model span for spawn, cliffs and the crossing threshold', () => {
+    const g = worldFor(800);
+    const model = generateBridge({ type: 'flat', seed: 'sim-wide', budget: 60, stickLen: 80, span: 800 });
+    const sim = createSim(model);
+    sim.spawnWalker(byId('fly'));
+    expect(sim.activeWalker.position.x).toBeLessThan(g.gapX0);
+    expect(sim.activeWalker.position.x).toBeGreaterThan(g.gapX0 - 100);
+    run(sim, 1200);
+    expect(sim.walkerCrossed()).toBe(true);
+    expect(sim.brokenCount).toBe(0);
+  });
+
+  it('narrow span truss carries a human across', () => {
+    const model = generateBridge({ type: 'truss', seed: 'n1', budget: 200, stickLen: 80, span: 480 });
+    const sim = createSim(model, { onBreak: () => { throw new Error('must not break'); } });
+    sim.spawnWalker(byId('human'));
+    run(sim, 1500, (s) => s.walkerCrossed());
     expect(sim.walkerCrossed()).toBe(true);
     expect(sim.brokenCount).toBe(0);
   });

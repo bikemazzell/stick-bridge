@@ -1,9 +1,8 @@
 import Matter from 'matter-js';
-import { WORLD, MATERIAL, MASS_SCALE } from '../config.js';
+import { MATERIAL, MASS_SCALE, worldFor } from '../config.js';
 import { deckPath } from '../model.js';
 
 const { Engine, World, Bodies, Body, Composite, Constraint, Vector } = Matter;
-const { width, height, gapX0, gapX1, deckY, groundY } = WORLD;
 
 const GROUND_CATEGORY = 0x0001;
 const DECK_CATEGORY = 0x0002;
@@ -24,6 +23,7 @@ const constraintStretch = (constraint) =>
 
 export function createSim(model, hooks = {}) {
   const { onBreak, onWalkerExit, onWalkerFall } = hooks;
+  const { width, gapX0, gapX1, deckY, groundY } = worldFor(model.span);
   const engine = Engine.create();
   engine.gravity.x = 0;
   engine.gravity.y = 1;

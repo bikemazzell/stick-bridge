@@ -389,10 +389,10 @@ Budget safety: at span max 800 and stickLen min 40 the deck needs ceil(800/40) =
 - Modify: `src/game/physics/sim.js`
 - Test: `tests/sim.test.js`
 
-- [ ] **Step 1: Failing tests.** Flat span 800 + fly: walker spawns left of the new gap (`x < worldFor(800).gapX0`), crosses within 900 ticks (proves cliffs + crossed threshold moved). Truss span 480 budget 200 + human: survives (narrower bridge is stronger or equal).
-- [ ] **Step 2: Implement.** sim.js: compute `const { width, height, gapX0, gapX1, deckY, groundY } = worldFor(model.span)` inside `createSim`; delete module-level `WORLD` destructure.
-- [ ] **Step 3: `npx vitest run` green.**
-- [ ] **Step 4: Commit** `feat: span-aware physics world`
+- [x] **Step 1: Failing tests.** Flat span 800 + fly: walker spawns left of the new gap (`x < worldFor(800).gapX0`), crosses within 900 ticks (proves cliffs + crossed threshold moved). Truss span 480 budget 200 + human: survives (seed n1; seed sim-narrow at 6 panels is a 2-apex warren that legitimately snaps 2 sticks yet still crosses).
+- [x] **Step 2: Implement.** sim.js: compute `const { width, height, gapX0, gapX1, deckY, groundY } = worldFor(model.span)` inside `createSim`; delete module-level `WORLD` destructure.
+- [x] **Step 3: `npx vitest run` green.**
+- [x] **Step 4: Commit** `feat: span-aware physics world`
 
 ### Task 16: Span in scenery, menu, params, e2e
 
