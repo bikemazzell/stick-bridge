@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { lerpColor, skyState, celestial, starField, shade } from '../src/render/sky.js';
 import { createWeather, weatherLabel } from '../src/render/weather.js';
 import { createScenery } from '../src/render/scenery.js';
-import { CHAR_DRAWERS, drawWalker } from '../src/render/characters.js';
+import { CHAR_DRAWERS, drawWalker, drawSpeechBubble } from '../src/render/characters.js';
 import { createRenderer } from '../src/render/renderer.js';
 import { LADDER, worldFor } from '../src/game/config.js';
 import { generateBridge } from '../src/game/bridge/generator.js';
@@ -120,6 +120,28 @@ describe('characters', () => {
 
   it('throws on unknown walker', () => {
     expect(() => drawWalker(fakeCtx(), { id: 'alien', size: 10 }, 0, 0, 0)).toThrow(/no character drawer/);
+  });
+});
+
+describe('speech bubble', () => {
+  it('draws rant bubbles without throwing', () => {
+    const ctx = fakeCtx();
+    expect(() => drawSpeechBubble(ctx, 640, 300, '@$!')).not.toThrow();
+    expect(() => drawSpeechBubble(ctx, 100, 50, '\u{1F621}\u{1F627}\u{1F92C}\u{1F624}')).not.toThrow();
+    expect(() => drawSpeechBubble(ctx, 0, 720, '@?!')).not.toThrow();
+  });
+
+  it('renderer draws a ranting walker without throwing', () => {
+    const r = createRenderer({ getContext: () => fakeCtx() });
+    const model = generateBridge({ type: 'flat', seed: 'render-4', budget: 40, stickLen: 80 });
+    expect(() =>
+      r.draw({
+        model,
+        tickCount: 400,
+        seed: 'render-4',
+        walkers: [{ def: LADDER[0], x: 640, y: 400, rant: '@$!' }],
+      }),
+    ).not.toThrow();
   });
 });
 

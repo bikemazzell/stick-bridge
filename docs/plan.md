@@ -503,10 +503,10 @@ Two additions: (1) a walker stuck in one spot for more than 5 seconds (300 ticks
 - Modify: `src/render/characters.js` (export `drawSpeechBubble(ctx, x, y, text)`), `src/render/renderer.js` (draw w.rant bubbles), `src/main.js` (attach rant when `ctl.ticksSinceProgress >= STUCK_BUBBLE_TICKS`)
 - Test: `tests/render.test.js`
 
-- [ ] **Step 1: Failing test.** drawSpeechBubble smoke with the fake ctx (no throw, calls beginPath/fillText); renderer smoke frameState with a walker carrying `rant` draws without throwing.
-- [ ] **Step 2: Implement.** Bubble: rounded rect + tail above the walker head, text via fillText; renderer draws it for walkers with a rant; main.js computes `rantFor(gs.config.seed, tickCount)` when stuck >= 300 ticks (exposed `ctl.ticksSinceProgress` already public).
-- [ ] **Step 3: `npx vitest run` green.**
-- [ ] **Step 4: Commit** `feat: stuck walkers show angry speech bubbles`
+- [x] **Step 1: Failing test.** drawSpeechBubble smoke with the fake ctx (no throw, calls beginPath/fillText); renderer smoke frameState with a walker carrying `rant` draws without throwing.
+- [x] **Step 2: Implement.** Bubble: rounded rect + tail above the walker head, text via fillText; renderer draws it for walkers with a rant; main.js computes `rantFor(gs.config.seed, tickCount)` when stuck >= 300 ticks (exposed `ctl.ticksSinceProgress` already public).
+- [x] **Step 3: `npx vitest run` green.**
+- [x] **Step 4: Commit** `feat: stuck walkers show angry speech bubbles`
 
 ### Task 26: Randomized canyon scene
 

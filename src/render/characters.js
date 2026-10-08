@@ -366,3 +366,42 @@ export function drawWalker(ctx, def, x, y, phase) {
   drawer(ctx, x, y, phase, def.size);
   ctx.restore();
 }
+
+// Frustration bubble above a stuck walker's head: (x, y) is the bubble's
+// bottom tip, text is the rant glyph string.
+export function drawSpeechBubble(ctx, x, y, text) {
+  const chars = [...String(text)];
+  const w = Math.max(46, chars.length * 18 + 16);
+  const h = 30;
+  const left = x - w / 2;
+  const top = y - h - 8;
+  const r = 9;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(left + r, top);
+  ctx.lineTo(left + w - r, top);
+  ctx.arcTo(left + w, top, left + w, top + r, r);
+  ctx.lineTo(left + w, top + h - r);
+  ctx.arcTo(left + w, top + h, left + w - r, top + h, r);
+  ctx.lineTo(x + 5, top + h);
+  ctx.lineTo(x, top + h + 8);
+  ctx.lineTo(x - 5, top + h);
+  ctx.lineTo(left + r, top + h);
+  ctx.arcTo(left, top + h, left, top + h - r, r);
+  ctx.lineTo(left, top + r);
+  ctx.arcTo(left, top, left + r, top, r);
+  ctx.closePath();
+  ctx.fillStyle = '#fdfdfd';
+  ctx.fill();
+  ctx.strokeStyle = '#2a3245';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.fillStyle = '#1d2637';
+  ctx.font = '700 16px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, x, top + h / 2 + 1);
+  ctx.restore();
+}

@@ -3,7 +3,7 @@ import { SPAN } from '../game/config.js';
 import { skyState, celestial, starField, drawSky, drawCelestial, drawStars, lerpColor } from './sky.js';
 import { createWeather, drawWeather, weatherLabel } from './weather.js';
 import { createScenery, drawScenery } from './scenery.js';
-import { drawWalker } from './characters.js';
+import { drawWalker, drawSpeechBubble } from './characters.js';
 import { walkerPhase } from '../game/walkers.js';
 
 const WOOD = '#d9a066';
@@ -211,6 +211,7 @@ export function createRenderer(canvas) {
     for (const w of walkers) {
       const phase = w.phase ?? walkerPhase(w.x, w.def.speed);
       drawWalker(ctx, w.def, w.x, w.y, phase);
+      if (w.rant) drawSpeechBubble(ctx, w.x, w.y - w.def.size * 1.6 - 14, w.rant);
     }
 
     drawDust();

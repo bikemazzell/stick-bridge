@@ -1,10 +1,11 @@
-import { WORLD, LADDER, DEFAULTS } from './game/config.js';
+import { WORLD, LADDER, DEFAULTS, STUCK_BUBBLE_TICKS } from './game/config.js';
 import { generateBridge } from './game/bridge/generator.js';
 import { sticksUsed } from './game/model.js';
 import { createSim } from './game/physics/sim.js';
 import { createGameState, transition } from './game/state.js';
 import { createLadderController } from './game/walkers.js';
 import { parseParams } from './game/params.js';
+import { rantFor } from './game/rant.js';
 import { createRenderer } from './render/renderer.js';
 import { weatherLabel } from './render/weather.js';
 import { createMenu } from './ui/menu.js';
@@ -179,10 +180,12 @@ function render() {
   const walkers = [];
   if (gs.state === 'testing' && sim && ctl && ctl.current && sim.activeWalker) {
     const def = ctl.current;
+    const stuck = ctl.ticksSinceProgress >= STUCK_BUBBLE_TICKS;
     walkers.push({
       def,
       x: sim.activeWalker.position.x,
       y: sim.activeWalker.position.y + def.size,
+      rant: stuck ? rantFor(gs.config.seed, tickCount) : null,
     });
   }
   renderer.draw({
