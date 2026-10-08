@@ -34,7 +34,7 @@ A 2D educational web game. The player picks a popsicle stick bridge type, sets a
 
 ## Game flow
 
-1. Menu: player picks bridge type (Flat Beam, Truss, Suspension), max sticks (slider, 20 to 300), stick length (slider, 40 to 120 px), and a seed (random button included). A small preview sketch redraws on change.
+1. Menu: player picks bridge type (Flat Beam, Truss, Suspension), max sticks (slider, 20 to 300), stick length (slider, 40 to 120 px), canyon span (slider, 480 to 800 px), and a seed (random button included). The seed field starts fully randomized on every cold start of the page; when the player returns to the menu after a round (New Bridge or the in-game exit), the previous values (type, sliders, seed) are kept so tweaks are easy. A small preview sketch redraws on change.
 2. Press Start. The generator builds the bridge with the seed's randomness and animates sticks flying into place. HUD shows sticks used vs budget.
 3. The test ladder begins: walkers cross one at a time, left to right. HUD shows the current walker, its mass, and how many walkers have crossed.
 4. Any stick or cable whose load exceeds its strength snaps, becomes falling debris, and the collapse cascade follows. The walker falls too.
@@ -90,7 +90,7 @@ Each walker has a distinct low-poly look and a simple two-leg or multi-leg walk 
 ## Screens
 
 1. Menu screen (DOM overlay): type cards with mini canvas sketches, sliders for stick budget and length, seed field with dice button, Start button.
-2. Test screen: full canvas game, HUD strip (current walker and mass, sticks used, stress max percent, seed, weather icon), bridge stands center.
+2. Test screen: full canvas game, HUD strip (current walker and mass, sticks used, stress max percent, seed, weather icon) plus an in-game speed button that cycles the simulation speed 1x, 4x, 8x, 16x and back to 1x, and an exit button that abandons the round and returns to the menu with the previous values kept. Bridge stands center.
 3. Result overlay: outcome, heaviest walker crossed, break reason, one fact, buttons Replay and New Bridge.
 
 ## Educational content

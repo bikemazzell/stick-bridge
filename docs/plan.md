@@ -412,3 +412,58 @@ Budget safety: at span max 800 and stickLen min 40 the deck needs ceil(800/40) =
 - [x] `npm run build` clean.
 - [x] `npm run e2e` green (all scenarios incl. span).
 - [x] Tick all checkboxes above; commit `chore: span feature final gate`
+
+---
+
+## Feature: Random cold-start seed, menu memory, in-game speed and exit
+
+Three UX behaviors: (1) every cold start of the page randomizes the menu seed (UI-level `Math.random`, never game logic); (2) returning to the menu after a round (result screen New Bridge or the new in-game exit) keeps the previous type, sliders, and seed; (3) during building/testing the HUD strip gets a speed button cycling 1x -> 4x -> 8x -> 16x -> 1x and an exit button that abandons the round back to the menu.
+
+### Task 18: FSM EXIT event
+
+**Files:**
+- Modify: `src/game/state.js`
+- Test: `tests/state.test.js`
+
+- [ ] **Step 1: Failing tests.** EXIT from building and from testing returns a fresh menu state (createGameState equal); EXIT in menu/result state is ignored (same object returned).
+- [ ] **Step 2: Implement.** Add `EXIT: () => createGameState()` to the building and testing handler maps.
+- [ ] **Step 3: `npx vitest run` green.**
+- [ ] **Step 4: Commit** `feat: fsm exit event`
+
+### Task 19: Menu cold-start random seed + prefill
+
+**Files:**
+- Modify: `src/ui/menu.js`
+- Test: `tests/ui.test.js`
+
+- [ ] **Step 1: Failing tests.** Cold start: seed input matches /^[a-z]+-\d{3}$/ and differs across two menus. Prefill: createMenu(root, cb, {type:'suspension', seed:'keep-1', budget:66, stickLen:100, span:760}) shows those values (selected card, slider values + outputs, seed input), and Start emits them unchanged.
+- [ ] **Step 2: Implement.** Extract `randomSeed()` (SEED_WORDS + Math.random); third `initial` param: type/s budget/stickLen/span baked into template, seed assigned via input.value after render (avoids HTML injection from query params); dice reuses randomSeed.
+- [ ] **Step 3: `npx vitest run` green.**
+- [ ] **Step 4: Commit** `feat: menu random cold seed and prefill`
+
+### Task 20: HUD speed and exit buttons
+
+**Files:**
+- Modify: `src/ui/hud.js`, `src/style.css`
+- Test: `tests/ui.test.js`
+
+- [ ] **Step 1: Failing tests.** createHud renders `[data-action="speed"]` (label `1x`) and `[data-action="menu"]`; `setSpeed(8)` shows `8x`; clicking the buttons fires the onSpeed/onMenu callbacks passed to createHud(root, {onSpeed, onMenu}).
+- [ ] **Step 2: Implement.** Append two buttons to the pill row; setSpeed(n) writes `${n}x`; wire click listeners; style as HUD buttons.
+- [ ] **Step 3: `npx vitest run` green.**
+- [ ] **Step 4: Commit** `feat: hud speed and exit buttons`
+
+### Task 21: Main wiring + e2e
+
+**Files:**
+- Modify: `src/main.js`, `e2e/run.mjs`
+
+- [ ] **Step 1: Implement.** main.js: `let speed` (was const); SPEEDS = [1,4,8,16]; hud created with onSpeed (cycle, hud.setSpeed) and onMenu (exitToMenu: keep gs.config copy, destroy hud/result, transition EXIT, null sim/ctl/model, createMenu(app, startRound, prevConfig)); onNew passes previous config to createMenu the same way; hud.setSpeed(speed) after creation.
+- [ ] **Step 2: E2e S8 (cold seed):** two fresh page loads produce different menu seeds matching the pattern. **S9 (speed + exit):** `?seed=e2e-exit&type=flat&budget=40&speed=1`, click speed button -> `4x`, click menu -> menu screen visible with seed `e2e-exit`, budget `40`, flat card selected; Start -> testing again. `npm run e2e` green.
+- [ ] **Step 3: Commit** `feat: in-game speed and exit wiring with e2e`
+
+### Task 22: Final gate (menu memory feature)
+
+- [ ] `npm test` green.
+- [ ] `npm run build` clean.
+- [ ] `npm run e2e` green (all scenarios incl. cold seed, speed, exit).
+- [ ] Tick all checkboxes above; commit `chore: menu memory final gate`
