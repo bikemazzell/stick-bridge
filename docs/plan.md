@@ -521,7 +521,9 @@ Two additions: (1) a walker stuck in one spot for more than 5 seconds (300 ticks
 
 ### Task 27: Final gate (bubbles + scenery feature)
 
-- [ ] `npm test` green.
-- [ ] `npm run build` clean.
-- [ ] `npm run e2e` green (full suite).
-- [ ] Manual visual check of a stuck-bubble round via dev server; tick all checkboxes above; commit `chore: bubbles and scenery final gate`
+- [x] `npm test` green.
+- [x] `npm run build` clean.
+- [x] `npm run e2e` green (full suite).
+- [x] Manual visual check of a stuck-bubble round via dev server; tick all checkboxes above; commit `chore: bubbles and scenery final gate`
+
+Notes: a genuinely-stuck round needed the exit hooks wired in the probe (fly crossing on flat/300/120 was a probe artifact); the real stall is the elephant (walker 8) on suspension/300/120 seed stuck-0. Headless screenshot at 3x confirmed the white tailed bubble above the stuck elephant with bold glyph text (symbols render everywhere; emoji legibility depends on system emoji fonts, fine in desktop Brave). 194/194 unit, build clean, e2e 32/32.
