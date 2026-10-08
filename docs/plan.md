@@ -514,10 +514,10 @@ Two additions: (1) a walker stuck in one spot for more than 5 seconds (300 ticks
 - Modify: `src/render/scenery.js`
 - Test: `tests/render.test.js`
 
-- [ ] **Step 1: Failing tests.** createScenery: wallJags.left/right length in 4..7 and varies across seeds (>= 2 distinct counts over 10 seeds); ridge1/ridge2 arrays of 3..6 seeded points {xFrac in 0..1, h > 0}, varying across seeds; trees length in 6..10 (3-5 per cliff); riverSticks length 5..9; same seed still fully deterministic (existing test). drawScenery smoke with fake ctx does not throw.
-- [ ] **Step 2: Implement.** Draw both backdrop layers from ridge points (x = gapX0 - 30 + xFrac * (span + 60), peaks subtract h from the layer base line); jag count/amplitude from seed; tree and river counts from seed.
-- [ ] **Step 3: `npx vitest run` green.**
-- [ ] **Step 4: Commit** `feat: per-seed randomized canyon and backdrop`
+- [x] **Step 1: Failing tests.** createScenery: wallJags.left/right length in 4..7 and varies across seeds (>= 2 distinct counts over 10 seeds); ridge1/ridge2 arrays of 3..6 seeded points {xFrac in 0..1, h > 0}, varying across seeds; trees length in 6..10 (3-5 per cliff); riverSticks length 5..9; same seed still fully deterministic (existing test). drawScenery smoke with fake ctx does not throw.
+- [x] **Step 2: Implement.** Draw both backdrop layers from ridge points (x = gapX0 - 30 + xFrac * (span + 60), peaks subtract h from the layer base line); jag count/amplitude from seed; tree and river counts from seed.
+- [x] **Step 3: `npx vitest run` green.**
+- [x] **Step 4: Commit** `feat: per-seed randomized canyon and backdrop`
 
 ### Task 27: Final gate (bubbles + scenery feature)
 

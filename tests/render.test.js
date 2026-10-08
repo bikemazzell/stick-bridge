@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { lerpColor, skyState, celestial, starField, shade } from '../src/render/sky.js';
 import { createWeather, weatherLabel } from '../src/render/weather.js';
-import { createScenery } from '../src/render/scenery.js';
+import { createScenery, drawScenery } from '../src/render/scenery.js';
 import { CHAR_DRAWERS, drawWalker, drawSpeechBubble } from '../src/render/characters.js';
 import { createRenderer } from '../src/render/renderer.js';
 import { LADDER, worldFor } from '../src/game/config.js';
@@ -90,7 +90,8 @@ describe('weather', () => {
 describe('scenery', () => {
   it('creates trees on both cliffs deterministically', () => {
     const a = createScenery('s1');
-    expect(a.trees.length).toBe(8);
+    expect(a.trees.length).toBeGreaterThanOrEqual(6);
+    expect(a.trees.length).toBeLessThanOrEqual(10);
     expect(a).toEqual(createScenery('s1'));
   });
 
@@ -99,12 +100,70 @@ describe('scenery', () => {
       const g = worldFor(span);
       const s = createScenery('s1', span);
       expect(s.span).toBe(span);
-      expect(s.trees.length).toBe(8);
+      expect(s.trees.length).toBeGreaterThanOrEqual(6);
       for (const t of s.trees) {
         const onLeft = t.x > 40 && t.x < g.gapX0 - 30;
         const onRight = t.x > g.gapX1 + 30 && t.x < g.width - 40;
         expect(onLeft || onRight, `tree at ${t.x} near a cliff for span ${span}`).toBe(true);
       }
+    }
+  });
+
+  it('varies cliff jag counts and amplitudes across seeds', () => {
+    const counts = new Set();
+    const firsts = new Set();
+    for (let i = 0; i < 10; i++) {
+      const s = createScenery(`jag-${i}`);
+      expect(s.wallJags.left.length).toBeGreaterThanOrEqual(4);
+      expect(s.wallJags.left.length).toBeLessThanOrEqual(7);
+      expect(s.wallJags.right.length).toBeGreaterThanOrEqual(4);
+      expect(s.wallJags.right.length).toBeLessThanOrEqual(7);
+      for (const j of s.wallJags.left) {
+        expect(j).toBeGreaterThan(0);
+        expect(j).toBeLessThanOrEqual(70);
+      }
+      counts.add(s.wallJags.left.length);
+      firsts.add(s.wallJags.left[0]);
+    }
+    expect(counts.size, 'jag count varies').toBeGreaterThanOrEqual(2);
+    expect(firsts.size, 'jag values vary').toBeGreaterThanOrEqual(2);
+  });
+
+  it('builds seeded mountain ridge lines for both backdrop layers', () => {
+    const shapes = new Set();
+    for (let i = 0; i < 10; i++) {
+      const s = createScenery(`ridge-${i}`);
+      for (const ridge of [s.ridge1, s.ridge2]) {
+        expect(ridge.length).toBeGreaterThanOrEqual(3);
+        expect(ridge.length).toBeLessThanOrEqual(6);
+        for (const p of ridge) {
+          expect(p.x).toBeGreaterThanOrEqual(0.08);
+          expect(p.x).toBeLessThanOrEqual(0.92);
+          expect(p.h).toBeGreaterThan(10);
+        }
+      }
+      expect(s.ridge1[0].x).toBeLessThan(s.ridge1[s.ridge1.length - 1].x);
+      shapes.add(s.ridge1.map((p) => `${p.x.toFixed(2)}:${p.h.toFixed(0)}`).join('|'));
+    }
+    expect(shapes.size, 'ridge lines vary across seeds').toBeGreaterThanOrEqual(2);
+  });
+
+  it('varies river shimmer density per seed', () => {
+    const lens = new Set();
+    for (let i = 0; i < 10; i++) {
+      const s = createScenery(`river-${i}`);
+      expect(s.riverSticks.length).toBeGreaterThanOrEqual(5);
+      expect(s.riverSticks.length).toBeLessThanOrEqual(9);
+      lens.add(s.riverSticks.length);
+    }
+    expect(lens.size).toBeGreaterThanOrEqual(2);
+  });
+
+  it('draws the varied scene without throwing', () => {
+    const ctx = fakeCtx();
+    for (const seed of ['d-1', 'd-2', 'd-3']) {
+      const s = createScenery(seed, 640);
+      expect(() => drawScenery(ctx, s, 120, 0.8)).not.toThrow();
     }
   });
 });

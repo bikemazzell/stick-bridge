@@ -6,22 +6,38 @@ export function createScenery(seed = 'scenery', span) {
   const g = worldFor(span);
   const rng = rngHelpers(makeRng(`${seed}:scenery`));
   const trees = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < rng.int(3, 5); i++) {
     trees.push({ x: rng.range(60, g.gapX0 - 60), h: rng.range(40, 80), w: rng.range(14, 26), tone: rng.pick([0, 1]) });
   }
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < rng.int(3, 5); i++) {
     trees.push({ x: rng.range(g.gapX1 + 60, g.width - 60), h: rng.range(40, 80), w: rng.range(14, 26), tone: rng.pick([0, 1]) });
   }
+  // jagged cliff faces: count and amplitude vary per seed
+  const jagAmp = rng.range(0.7, 1.3);
   const wallJags = { left: [], right: [] };
-  for (let i = 0; i < 6; i++) {
-    wallJags.left.push(rng.range(8, 52));
-    wallJags.right.push(rng.range(8, 52));
+  for (let i = 0; i < rng.int(4, 7); i++) {
+    wallJags.left.push(rng.range(8, 52) * jagAmp);
   }
+  for (let i = 0; i < rng.int(4, 7); i++) {
+    wallJags.right.push(rng.range(8, 52) * jagAmp);
+  }
+  // seeded mountain ridge lines for the two backdrop layers (xFrac across the
+  // gap, h above the layer base line)
+  const ridge = (hMin, hMax) => {
+    const pts = [];
+    for (let i = 0; i < rng.int(3, 6); i++) {
+      pts.push({ x: rng.range(0.08, 0.92), h: rng.range(hMin, hMax) });
+    }
+    pts.sort((a, b) => a.x - b.x);
+    return pts;
+  };
+  const ridge1 = ridge(35, 85);
+  const ridge2 = ridge(20, 60);
   const riverSticks = [];
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < rng.int(5, 9); i++) {
     riverSticks.push({ x: rng.range(0, 200), y: rng.range(4, 12), w: rng.range(20, 60), v: rng.range(0.2, 0.6) });
   }
-  return { span: g.gapX1 - g.gapX0, trees, wallJags, riverSticks };
+  return { span: g.gapX1 - g.gapX0, trees, wallJags, ridge1, ridge2, riverSticks };
 }
 
 function poly(ctx, points) {
@@ -51,26 +67,26 @@ function drawTree(ctx, tree, deckY, light) {
 
 export function drawScenery(ctx, scenery, tick, light) {
   const { width, gapX0, gapX1, deckY, groundY } = worldFor(scenery.span);
-  const cx = (gapX0 + gapX1) / 2;
-  const half = (gapX1 - gapX0) / 2;
   const far = shade('#b08d7a', light);
   const mid = shade('#9a7a6a', light);
   const rock = shade('#5d4037', light);
   const rockDark = shade('#4a322b', light);
 
-  // far canyon backdrop
+  // far canyon backdrop drawn from the seeded ridge lines
+  const ridgePoly = (ridge, baseY) => {
+    const pts = [[gapX0 - 30, baseY]];
+    for (const p of ridge) {
+      pts.push([gapX0 - 30 + p.x * (gapX1 - gapX0 + 60), baseY - p.h]);
+    }
+    pts.push([gapX1 + 30, baseY], [gapX1 + 30, groundY + 20], [gapX0 - 30, groundY + 20]);
+    return pts;
+  };
   ctx.fillStyle = far;
   ctx.globalAlpha = 0.55;
-  poly(ctx, [
-    [gapX0 - 30, 560], [gapX0 + 90, 505], [gapX0 + 220, 545], [cx, 495],
-    [gapX1 - 220, 545], [gapX1 - 90, 505], [gapX1 + 30, 560], [gapX1 + 30, groundY + 20], [gapX0 - 30, groundY + 20],
-  ]);
+  poly(ctx, ridgePoly(scenery.ridge1, 560));
   ctx.globalAlpha = 0.8;
   ctx.fillStyle = mid;
-  poly(ctx, [
-    [gapX0 - 20, 600], [gapX0 + 130, 560], [cx - half * 0.75, 585], [cx, 555], [cx + half * 0.75, 585], [gapX1 - 130, 560], [gapX1 + 20, 600],
-    [gapX1 + 20, groundY + 20], [gapX0 - 20, groundY + 20],
-  ]);
+  poly(ctx, ridgePoly(scenery.ridge2, 600));
   ctx.globalAlpha = 1;
 
   // canyon walls with jagged faces
