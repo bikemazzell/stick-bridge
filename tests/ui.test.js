@@ -58,6 +58,49 @@ describe('menu', () => {
     expect(seed.value === before ? true : true).toBe(true);
   });
 
+  it('randomizes the seed on every cold start', () => {
+    const seeds = [];
+    for (let i = 0; i < 5; i++) {
+      document.body.innerHTML = '';
+      createMenu(document.body, () => {});
+      const seed = document.querySelector('[data-input="seed"]');
+      expect(seed.value).toMatch(/^[a-z]+-\d{3}$/);
+      seeds.push(seed.value);
+    }
+    expect(new Set(seeds).size).toBeGreaterThan(1);
+  });
+
+  it('prefills previous round values when given an initial config', () => {
+    createMenu(document.body, () => {}, {
+      type: 'suspension',
+      seed: 'keep-1',
+      budget: 66,
+      stickLen: 100,
+      span: 760,
+    });
+    expect(document.querySelector('.card[data-type="suspension"]').classList.contains('selected')).toBe(true);
+    expect(document.querySelector('[data-input="seed"]').value).toBe('keep-1');
+    expect(document.querySelector('[data-input="budget"]').value).toBe('66');
+    expect(document.querySelector('[data-out="budget"]').textContent).toBe('66');
+    expect(document.querySelector('[data-input="stickLen"]').value).toBe('100');
+    expect(document.querySelector('[data-out="stickLen"]').textContent).toBe('100');
+    expect(document.querySelector('[data-input="span"]').value).toBe('760');
+    expect(document.querySelector('[data-out="span"]').textContent).toBe('760');
+  });
+
+  it('prefilled start emits the previous config unchanged', () => {
+    const got = [];
+    createMenu(document.body, (cfg) => got.push(cfg), {
+      type: 'flat',
+      seed: 'again-9',
+      budget: 40,
+      stickLen: 60,
+      span: 520,
+    });
+    click(document.querySelector('[data-action="start"]'));
+    expect(got).toEqual([{ type: 'flat', seed: 'again-9', budget: 40, stickLen: 60, span: 520 }]);
+  });
+
   it('shows a rotating hint from HINTS', () => {
     createMenu(document.body, () => {});
     const hint = document.querySelector('[data-out="hint"]');

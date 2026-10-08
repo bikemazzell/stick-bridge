@@ -436,10 +436,10 @@ Three UX behaviors: (1) every cold start of the page randomizes the menu seed (U
 - Modify: `src/ui/menu.js`
 - Test: `tests/ui.test.js`
 
-- [ ] **Step 1: Failing tests.** Cold start: seed input matches /^[a-z]+-\d{3}$/ and differs across two menus. Prefill: createMenu(root, cb, {type:'suspension', seed:'keep-1', budget:66, stickLen:100, span:760}) shows those values (selected card, slider values + outputs, seed input), and Start emits them unchanged.
-- [ ] **Step 2: Implement.** Extract `randomSeed()` (SEED_WORDS + Math.random); third `initial` param: type/s budget/stickLen/span baked into template, seed assigned via input.value after render (avoids HTML injection from query params); dice reuses randomSeed.
-- [ ] **Step 3: `npx vitest run` green.**
-- [ ] **Step 4: Commit** `feat: menu random cold seed and prefill`
+- [x] **Step 1: Failing tests.** Cold start: seed input matches /^[a-z]+-\d{3}$/ and differs across two menus. Prefill: createMenu(root, cb, {type:'suspension', seed:'keep-1', budget:66, stickLen:100, span:760}) shows those values (selected card, slider values + outputs, seed input), and Start emits them unchanged.
+- [x] **Step 2: Implement.** Extract `randomSeed()` (SEED_WORDS + Math.random); third `initial` param: type/s budget/stickLen/span baked into template, seed assigned via input.value after render (avoids HTML injection from query params); dice reuses randomSeed.
+- [x] **Step 3: `npx vitest run` green.**
+- [x] **Step 4: Commit** `feat: menu random cold seed and prefill`
 
 ### Task 20: HUD speed and exit buttons
 

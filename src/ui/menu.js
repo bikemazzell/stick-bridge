@@ -9,7 +9,13 @@ const TYPES = [
 
 const SEED_WORDS = ['woody', 'gluey', 'saggy', 'bouncy', 'snappy', 'creaky', 'wobbly', 'sturdy'];
 
-export function createMenu(root, onStart) {
+function randomSeed() {
+  const w = SEED_WORDS[Math.floor(Math.random() * SEED_WORDS.length)];
+  return `${w}-${Math.floor(Math.random() * 900 + 100)}`;
+}
+
+export function createMenu(root, onStart, initial) {
+  const preset = initial ?? {};
   const el = document.createElement('div');
   el.className = 'overlay menu';
   el.dataset.screen = 'menu';
@@ -19,20 +25,20 @@ export function createMenu(root, onStart) {
     <div class="cards"></div>
     <div class="controls">
       <label class="ctrl">
-        <span>Sticks: <b data-out="budget">${DEFAULTS.budget}</b></span>
-        <input data-input="budget" type="range" min="20" max="300" step="2" value="${DEFAULTS.budget}">
+        <span>Sticks: <b data-out="budget">${preset.budget ?? DEFAULTS.budget}</b></span>
+        <input data-input="budget" type="range" min="20" max="300" step="2" value="${preset.budget ?? DEFAULTS.budget}">
       </label>
       <label class="ctrl">
-        <span>Stick length: <b data-out="stickLen">${DEFAULTS.stickLen}</b></span>
-        <input data-input="stickLen" type="range" min="40" max="120" step="5" value="${DEFAULTS.stickLen}">
+        <span>Stick length: <b data-out="stickLen">${preset.stickLen ?? DEFAULTS.stickLen}</b></span>
+        <input data-input="stickLen" type="range" min="40" max="120" step="5" value="${preset.stickLen ?? DEFAULTS.stickLen}">
       </label>
       <label class="ctrl">
-        <span>Canyon span: <b data-out="span">${DEFAULTS.span}</b></span>
-        <input data-input="span" type="range" min="480" max="800" step="20" value="${DEFAULTS.span}">
+        <span>Canyon span: <b data-out="span">${preset.span ?? DEFAULTS.span}</b></span>
+        <input data-input="span" type="range" min="480" max="800" step="20" value="${preset.span ?? DEFAULTS.span}">
       </label>
       <label class="ctrl seedrow">
         <span>Seed</span>
-        <input data-input="seed" type="text" value="pop-1" maxlength="24">
+        <input data-input="seed" type="text" maxlength="24">
         <button data-action="dice" class="dice" title="Random seed">🎲</button>
       </label>
     </div>
@@ -41,7 +47,7 @@ export function createMenu(root, onStart) {
   `;
 
   const cardsBox = el.querySelector('.cards');
-  const state = { type: DEFAULTS.type };
+  const state = { type: preset.type ?? DEFAULTS.type };
 
   for (const t of TYPES) {
     const card = document.createElement('button');
@@ -76,9 +82,9 @@ export function createMenu(root, onStart) {
   stickLen.addEventListener('input', () => { stickLenOut.textContent = stickLen.value; });
   span.addEventListener('input', () => { spanOut.textContent = span.value; });
   dice.addEventListener('click', () => {
-    const w = SEED_WORDS[Math.floor(Math.random() * SEED_WORDS.length)];
-    seed.value = `${w}-${Math.floor(Math.random() * 900 + 100)}`;
+    seed.value = randomSeed();
   });
+  seed.value = preset.seed ?? randomSeed();
 
   let hintIndex = 0;
   hint.textContent = HINTS[0];
@@ -97,7 +103,6 @@ export function createMenu(root, onStart) {
       span: parseInt(span.value, 10),
     });
   });
-
   root.appendChild(el);
 
   return {
