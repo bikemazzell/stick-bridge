@@ -23,7 +23,7 @@
 - Create: `package.json`, `vite.config.js`, `.gitignore`, `index.html`, `src/style.css`, `tests/sanity.test.js`
 - Modify: none
 
-- [ ] **Step 1: Create package.json**
+- [x] **Step 1: Create package.json**
 
 ```json
 {
@@ -49,7 +49,7 @@
 }
 ```
 
-- [ ] **Step 2: Create .gitignore**
+- [x] **Step 2: Create .gitignore**
 
 ```
 node_modules/
@@ -57,7 +57,7 @@ dist/
 e2e/shots/
 ```
 
-- [ ] **Step 3: Create vite.config.js**
+- [x] **Step 3: Create vite.config.js**
 
 ```js
 import { defineConfig } from 'vite';
@@ -67,15 +67,15 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 4: Create index.html** with `<div id="app">`, `<canvas id="game">`, mounts `src/main.js`, links `src/style.css`. Minimal shell; menu/result overlays are built by UI code in Task 9.
+- [x] **Step 4: Create index.html** with `<div id="app">`, `<canvas id="game">`, mounts `src/main.js`, links `src/style.css`. Minimal shell; menu/result overlays are built by UI code in Task 9.
 
-- [ ] **Step 5: Create src/style.css** skeleton (full-screen canvas, overlay base classes). Filled out in Task 9.
+- [x] **Step 5: Create src/style.css** skeleton (full-screen canvas, overlay base classes). Filled out in Task 9.
 
-- [ ] **Step 6: Sanity test** `tests/sanity.test.js`: `expect(1 + 1).toBe(2)`.
+- [x] **Step 6: Sanity test** `tests/sanity.test.js`: `expect(1 + 1).toBe(2)`.
 
-- [ ] **Step 7: Verify:** `npm install` succeeds, `npx vitest run` passes 1 test, `npm run build` produces `dist/`.
+- [x] **Step 7: Verify:** `npm install` succeeds, `npx vitest run` passes 1 test, `npm run build` produces `dist/`.
 
-- [ ] **Step 8: Commit** `chore: project scaffold`
+- [x] **Step 8: Commit** `chore: project scaffold`
 
 ### Task 1: Seeded RNG
 
@@ -90,11 +90,11 @@ export function makeRng(seed) // mulberry32 -> () => float [0,1)
 export function rngHelpers(rng) // { int(min,max), range(min,max), pick(arr), jitter(amount), chance(p) }
 ```
 
-- [ ] **Step 1: Failing tests.** Determinism: two `makeRng(42)` streams produce identical first 100 values; different seeds differ; `range` stays in bounds over 1000 draws; `pick` returns array elements; `int` inclusive bounds; `hashSeed('')` does not throw and is stable.
-- [ ] **Step 2: Run** `npx vitest run tests/rng.test.js` — expect FAIL (module missing).
-- [ ] **Step 3: Implement** xmur3 + mulberry32 (reference implementations, no license issue).
-- [ ] **Step 4: Tests pass.**
-- [ ] **Step 5: Commit** `feat: seeded rng`
+- [x] **Step 1: Failing tests.** Determinism: two `makeRng(42)` streams produce identical first 100 values; different seeds differ; `range` stays in bounds over 1000 draws; `pick` returns array elements; `int` inclusive bounds; `hashSeed('')` does not throw and is stable.
+- [x] **Step 2: Run** `npx vitest run tests/rng.test.js` — expect FAIL (module missing).
+- [x] **Step 3: Implement** xmur3 + mulberry32 (reference implementations, no license issue).
+- [x] **Step 4: Tests pass.**
+- [x] **Step 5: Commit** `feat: seeded rng`
 
 ### Task 2: Game config and walker ladder
 
@@ -118,11 +118,11 @@ export const DEFAULTS = { type: 'truss', budget: 120, stickLen: 80 };
 
 Ladder masses: fly 0.01, mouse 0.05, toy car 0.5, cat 4, dog 15, human 70, horse 400, car 1200, elephant 5000, tank 42000. Walker speed px/tick: small 2.0 down to tank 0.9.
 
-- [ ] **Step 1: Failing tests:** LADDER strictly increasing massKg; 10 entries; unique ids; FACTS has all 3 bridge types with 1+ strings each; MATERIAL breakStretch(stick) < breakStretch(cable); DEFAULTS in slider ranges (budget 20..300, stickLen 40..120).
-- [ ] **Step 2:** Run, expect FAIL.
-- [ ] **Step 3: Implement config.**
-- [ ] **Step 4:** Tests pass.
-- [ ] **Step 5: Commit** `feat: config and walker ladder`
+- [x] **Step 1: Failing tests:** LADDER strictly increasing massKg; 10 entries; unique ids; FACTS has all 3 bridge types with 1+ strings each; MATERIAL breakStretch(stick) < breakStretch(cable); DEFAULTS in slider ranges (budget 20..300, stickLen 40..120).
+- [x] **Step 2:** Run, expect FAIL.
+- [x] **Step 3: Implement config.**
+- [x] **Step 4:** Tests pass.
+- [x] **Step 5: Commit** `feat: config and walker ladder`
 
 ### Task 3: Bridge model
 
@@ -141,11 +141,11 @@ export function isConnected(model) // BFS: every node reachable from first fixed
 export function deckPath(model) // ordered deck member chain from left anchor to right anchor (deck members = members whose both endpoints have y === deckY within epsilon)
 ```
 
-- [ ] **Step 1: Failing tests:** addNode/addMember id refs; validate catches dangling refs, duplicate ids, zero-length members; sticksUsed counts only sticks; isConnected true for chain, false for orphan; deckPath returns ordered left-to-right chain covering the full gap for a hand-built chain.
-- [ ] **Step 2:** Run, expect FAIL.
-- [ ] **Step 3: Implement.**
-- [ ] **Step 4:** Tests pass.
-- [ ] **Step 5: Commit** `feat: bridge model`
+- [x] **Step 1: Failing tests:** addNode/addMember id refs; validate catches dangling refs, duplicate ids, zero-length members; sticksUsed counts only sticks; isConnected true for chain, false for orphan; deckPath returns ordered left-to-right chain covering the full gap for a hand-built chain.
+- [x] **Step 2:** Run, expect FAIL.
+- [x] **Step 3: Implement.**
+- [x] **Step 4:** Tests pass.
+- [x] **Step 5: Commit** `feat: bridge model`
 
 ### Task 4: Bridge generators
 
