@@ -408,7 +408,7 @@ Budget safety: at span max 800 and stickLen min 40 the deck needs ceil(800/40) =
 
 ### Task 17: Final gate (span feature)
 
-- [ ] `npm test` green.
-- [ ] `npm run build` clean.
-- [ ] `npm run e2e` green (all scenarios incl. span).
-- [ ] Tick all checkboxes above; commit `chore: span feature final gate`
+- [x] `npm test` green.
+- [x] `npm run build` clean.
+- [x] `npm run e2e` green (all scenarios incl. span).
+- [x] Tick all checkboxes above; commit `chore: span feature final gate`
