@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createSim } from '../src/game/physics/sim.js';
 import { generateBridge } from '../src/game/bridge/generator.js';
 import { createModel, addNode, addMember, deckPath } from '../src/game/model.js';
+import { createLadderController } from '../src/game/walkers.js';
 import { LADDER, WORLD, MASS_SCALE, worldFor } from '../src/game/config.js';
 import Matter from 'matter-js';
 
@@ -174,5 +175,44 @@ describe('physics simulation', () => {
       }
       expect(below, `cable clamps below deck for seed ${seed}`).toBe(0);
     }
+  });
+
+  it('deck ends stay level under a heavy walker near the far anchor', () => {
+    const model = generateBridge({ type: 'flat', seed: 'kink', budget: 300, stickLen: 80 });
+    const sim = createSim(model);
+    sim.spawnWalker(byId('human'));
+    Matter.Body.setPosition(sim.activeWalker, { x: gapX1 - 60, y: deckY - 40 });
+    run(sim, 400);
+
+    const deck = deckPath(model);
+    const slope = (member) => Math.abs(Math.sin(sim.bodies.get(member.id).angle));
+    expect(slope(deck.members[0]), 'first panel slope').toBeLessThan(0.2);
+    expect(slope(deck.members[deck.members.length - 1]), 'last panel slope').toBeLessThan(0.2);
+  });
+
+  it('a heavy walker stranded in a sag pocket struggles free and crosses', () => {
+    const elephant = byId('elephant');
+    const model = generateBridge({ type: 'suspension', seed: 'kink', budget: 300, stickLen: 120 });
+    const sim = createSim(model);
+    sim.spawnWalker(elephant);
+    Matter.Body.setPosition(sim.activeWalker, { x: 640, y: deckY - elephant.size - 2 });
+    run(sim, 6000, (s) => s.walkerCrossed());
+    expect(sim.walkerCrossed(), 'elephant hops out of the pocket and crosses').toBe(true);
+  });
+
+  it('the formerly stuck elephant round no longer ends stuck', () => {
+    const model = generateBridge({ type: 'suspension', seed: 'stuck-0', budget: 300, stickLen: 120 });
+    const sim = createSim(model, {
+      onWalkerExit: (id) => ctl.onExit(id),
+      onWalkerFall: (id) => ctl.onFall(id),
+    });
+    let outcome = null;
+    const ctl = createLadderController(sim, { onFinish: (reason) => { outcome = reason; } });
+    ctl.start();
+    for (let t = 0; t < 40000 && !ctl.finished; t++) {
+      sim.tick();
+      ctl.tick();
+    }
+    expect(outcome).not.toBe('stuck');
   });
 });

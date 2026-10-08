@@ -538,16 +538,16 @@ Truss and suspension bridges get at least two glued support columns (piers) stan
 
 **Bug (user-reported):** the deck is only pinned at the cliff anchors, so a heavy walker kinks the deck sharply at the FIRST and LAST connection. At the far end the walker faces an unclimbable up-slope and strands just short of the cliff (seen live: elephant stuck at x~940 with a rant bubble, gapX1=960).
 
-**Fix (TDD):** weld the deck laminate groups at fixed anchor nodes to the world (pin at the node + offset world anchor along the panel), mirroring the tower base weld. Deck ends leave the cliff horizontally, like a glued popsicle abutment.
+**Fix (TDD), two parts after calibration dead ends:** (1) deck panels at fixed anchors get a pin+weld pair (clamped ends like glued popsicle abutments) with strengthScale 3 - unbreakable anchors made the tank test fail (bridge unbreakable) and plain welds snapped the end panel at t=38 (clamp moment vs laminate strength), 3x cliff glue holds the elephant but tears out under a 30x tank. Deck-deck interior welds (continuous beam) were tried and REVERTED: over-constraint chaos, 7 regressions, matching the original Task 5 lesson. (2) struggle hops: a walker with no x progress for 90 ticks kicks up-forward (vy -4.5, vx boost) - heavy walkers hop out of midspan sag pockets instead of stranding; the chain deck folds without stretching pins, so no joint-based fix can shallow the pocket.
 
 **Files:**
 - Modify: `src/game/physics/sim.js`
 - Test: `tests/sim.test.js`
 
-- [ ] **Step 1: Failing test.** Flat budget 300 deck, human parked near the far anchor: after 400 ticks the first and last deck panels stay near level (|sin(body.angle)| < 0.2 each).
-- [ ] **Step 2: Implement.** In the fixed-node joint loop, weld when the group is glued OR is a deck body.
-- [ ] **Step 3: `npx vitest run` green (all existing break/stuck tests unchanged).**
-- [ ] **Step 4: Probe the formerly-stuck round (suspension/300/120 seed stuck-0, elephant walker 8): expect it to cross now; add a regression test if it does. Commit** `fix: clamp deck ends so heavy walkers can climb off the bridge`
+- [x] **Step 1: Failing test.** Flat budget 300 deck, human parked near the far anchor: after 400 ticks the first and last deck panels stay near level (|sin(body.angle)| < 0.2 each).
+- [x] **Step 2: Implement.** In the fixed-node joint loop, weld when the group is glued OR is a deck body.
+- [x] **Step 3: `npx vitest run` green (all existing break/stuck tests unchanged).**
+- [x] **Step 4: Probe the formerly-stuck round (suspension/300/120 seed stuck-0, elephant walker 8): expect it to cross now; add a regression test if it does. Commit** `fix: clamp deck ends so heavy walkers can climb off the bridge`
 
 ### Task 29: Pier generator (TDD)
 

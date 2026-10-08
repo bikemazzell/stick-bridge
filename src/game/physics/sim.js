@@ -183,7 +183,7 @@ export function createSim(model, hooks = {}) {
     return bodies.get(member.id);
   };
 
-  const addJoint = (group, nodeId, anchorA, anchorB) => {
+  const addJoint = (group, nodeId, anchorA, anchorB, opts = {}) => {
     const aIsDeck = anchorA.body ? deckBodies.has(anchorA.body) : deckBodies.has(anchorB.body);
     const bIsDeck = anchorB.body ? deckBodies.has(anchorB.body) : deckBodies.has(anchorA.body);
     const deckJoint = aIsDeck && bIsDeck && (deckNodeIds.has(nodeId) || group.isDeck);
@@ -197,7 +197,7 @@ export function createSim(model, hooks = {}) {
       length: 0,
     });
     World.add(engine.world, constraint);
-    const joint = { memberId: group.id, nodeId, constraint, broken: false, ratio: 0 };
+    const joint = { memberId: group.id, nodeId, constraint, broken: false, ratio: 0, strengthScale: opts.strengthScale ?? 1 };
     joints.push(joint);
     return joint;
   };
@@ -232,12 +232,18 @@ export function createSim(model, hooks = {}) {
     if (here.length === 0) continue;
 
     if (node.fixed) {
+      // joints to the cliff are glued abutments: 3x member strength so clamped
+      // deck ends hold under heavy walkers but still tear out under a tank
       const anchor = { body: null, point: { x: node.x, y: node.y } };
       for (const e of here) {
-        addJoint(e.group, node.id, anchor, e.end);
-        if (gluedGroup(e.group)) {
+        addJoint(e.group, node.id, anchor, e.end, { strengthScale: 3 });
+        // glued stacks (towers) AND deck panels at anchors get a second world
+        // anchor: a pin pair welds rotation. Clamped deck ends leave the cliff
+        // horizontally (glued popsicle abutments) instead of kinking sharply,
+        // which used to trap heavy walkers in the sag at the far end.
+        if (gluedGroup(e.group) || deckBodies.has(e.group.body)) {
           const w = weldPoint(e.group, node);
-          addJoint(e.group, node.id, { body: null, point: w }, { body: e.group.body, point: offsetFrom(e.group.body, w) });
+          addJoint(e.group, node.id, { body: null, point: w }, { body: e.group.body, point: offsetFrom(e.group.body, w) }, { strengthScale: 3 });
         }
       }
     } else {
@@ -328,6 +334,7 @@ export function createSim(model, hooks = {}) {
   let fell = false;
   let settled = false;
   const debris = [];
+  const stall = { lastX: -Infinity, ticks: 0 };
 
   const updateCableSlack = () => {
     for (const c of cables) {
@@ -374,6 +381,8 @@ export function createSim(model, hooks = {}) {
       walkerDef = def;
       crossed = false;
       fell = false;
+      stall.lastX = -Infinity;
+      stall.ticks = 0;
       walker = Bodies.circle(gapX0 - 60, deckY - def.size - 10, def.size, {
         density: 0.001,
         friction: 0.05,
@@ -399,6 +408,17 @@ export function createSim(model, hooks = {}) {
         const target = walkerDef.speed;
         const dv = Math.max(-0.08, Math.min(0.08, target - walker.velocity.x));
         Body.setVelocity(walker, { x: walker.velocity.x + dv, y: walker.velocity.y });
+        // struggle hop: a walker wedged in a sag pocket kicks free every 90
+        // stalled ticks so heavy loads do not strand just short of the cliff
+        if (walker.position.x > stall.lastX + 2) {
+          stall.lastX = walker.position.x;
+          stall.ticks = 0;
+        } else {
+          stall.ticks++;
+          if (stall.ticks % 90 === 0) {
+            Body.setVelocity(walker, { x: Math.min(target * 1.5, walker.velocity.x + 1.2), y: -4.5 });
+          }
+        }
       }
       Engine.update(engine, dtMs);
       sim.time++;
@@ -406,7 +426,7 @@ export function createSim(model, hooks = {}) {
       for (const j of joints) {
         if (j.broken) continue;
         const group = memberGroup.get(j.memberId);
-        j.ratio = (constraintStretch(j.constraint) - j.baseline) / group.strength;
+        j.ratio = (constraintStretch(j.constraint) - j.baseline) / (group.strength * j.strengthScale);
         if (j.ratio >= 1) removeMember(j.memberId);
       }
 
