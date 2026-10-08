@@ -1,11 +1,14 @@
 import { worldFor } from '../config.js';
 import { addNode, addMember, sticksUsed } from '../model.js';
 import { buildDeck, strengthFor } from './deck.js';
+import { addPiers } from './pier.js';
 
 export function buildSuspension(model, rng, stickLen) {
   const { gapX0, gapX1, deckY } = worldFor(model.span);
   const deck = buildDeck(model, rng, stickLen);
   const span = gapX1 - gapX0;
+  const pierNodes = new Set();
+  addPiers(model, rng, stickLen, deck, pierNodes, 2);
 
   const remaining = model.budget - sticksUsed(model);
   // a tower needs at least one stick per side; with less left the suspension
@@ -67,6 +70,7 @@ export function buildSuspension(model, rng, stickLen) {
   }
 
   // laminate the deck with any leftover stick budget
+  addPiers(model, rng, stickLen, deck, pierNodes);
   let leftover = model.budget - sticksUsed(model);
   for (let layer = 2; layer <= 4 && leftover >= deck.nodes.length - 1; layer++) { leftover -= deck.nodes.length - 1;
     for (let i = 1; i < deck.nodes.length; i++) {

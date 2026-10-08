@@ -1,6 +1,7 @@
 import { worldFor } from '../config.js';
 import { addNode, addMember, sticksUsed } from '../model.js';
 import { buildDeck, strengthFor } from './deck.js';
+import { addPiers } from './pier.js';
 
 function deckRef(i) {
   return { deck: i };
@@ -47,6 +48,8 @@ function latticeCandidates(deck, h, flipped, deckY) {
 export function buildTruss(model, rng, stickLen) {
   const g = worldFor(model.span);
   const deck = buildDeck(model, rng, stickLen);
+  const pierNodes = new Set();
+  addPiers(model, rng, stickLen, deck, pierNodes, 2);
   const centerX = (g.gapX0 + g.gapX1) / 2;
   const substyle = rng.pick(['warren', 'pratt', 'howe']);
   const h = rng.range(40, 90);
@@ -82,6 +85,8 @@ export function buildTruss(model, rng, stickLen) {
 
   // laminate the deck when sticks are left over: a second glued layer doubles
   // the walking surface strength
+  addPiers(model, rng, stickLen, deck, pierNodes);
+  remaining = model.budget - sticksUsed(model);
   for (let layer = 2; layer <= 4 && remaining >= deck.nodes.length - 1; layer++) { remaining -= deck.nodes.length - 1;
     for (let i = 1; i < deck.nodes.length; i++) {
       addMember(model, deck.nodes[i - 1].id, deck.nodes[i].id, 'stick', strengthFor(rng, 'stick'));

@@ -556,10 +556,10 @@ Truss and suspension bridges get at least two glued support columns (piers) stan
 - Modify: `src/game/bridge/truss.js`, `src/game/bridge/suspension.js`
 - Test: `tests/generators.test.js`
 
-- [ ] **Step 1: Failing tests.** Truss and suspension at budget >= 60: `meta.piers >= 2`, at least 2 non-anchor fixed nodes at groundY, pier members glued, pier top = a deck node; budget 300 gives `meta.piers > 2`; flat has no fixed groundY nodes; tight budget (span 800 / budget 20 / stickLen 40) still valid + connected with deck complete; shared invariants (valid, connected, sticksUsed <= budget) keep passing with piers in the mix.
-- [ ] **Step 2: Implement.** pier.js: interior deck nodes sorted by |x - center|, skip nodes in `placed`, cost = ceil((groundY - node.y) / stickLen), build while budget allows up to maxCount, each segment glued with 3.5x strength bonus, base fixed at (node.x, groundY); meta.piers accumulates. truss/suspension: 2-pier call after deck, extras call after core structure, before lamination.
-- [ ] **Step 3: `npx vitest run` green.**
-- [ ] **Step 4: Commit** `feat: under-deck support piers for truss and suspension`
+- [x] **Step 1: Failing tests.** Truss and suspension at budget >= 60: `meta.piers >= 2`, at least 2 non-anchor fixed nodes at groundY, pier members glued, pier top = a deck node; budget 300 gives `meta.piers > 2`; flat has no fixed groundY nodes; tight budget (span 800 / budget 20 / stickLen 40) still valid + connected with deck complete; shared invariants (valid, connected, sticksUsed <= budget) keep passing with piers in the mix.
+- [x] **Step 2: Implement.** pier.js: interior deck nodes sorted by |x - center|, skip nodes in `placed`, cost = ceil((groundY - node.y) / stickLen), build while budget allows up to maxCount, each segment glued with 3.5x strength bonus, base fixed at (node.x, groundY); meta.piers accumulates. truss/suspension: 2-pier call after deck, extras call after core structure, before lamination.
+- [x] **Step 3: `npx vitest run` green.**
+- [x] **Step 4: Commit** `feat: under-deck support piers for truss and suspension`
 
 ### Task 30: Pier physics + visual gate
 

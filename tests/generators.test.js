@@ -236,6 +236,78 @@ describe('variable span', () => {
   });
 });
 
+describe('under-deck piers', () => {
+  const GROUND_Y = 700;
+
+  function pierColumns(model) {
+    const byId = new Map(model.nodes.map((n) => [n.id, n]));
+    const bases = model.nodes.filter((n) => n.fixed && Math.abs(n.y - GROUND_Y) < 1 && Math.abs(n.x - gapX0) > 1 && Math.abs(n.x - gapX1) > 1);
+    return bases.map((base) => {
+      const chain = [base];
+      const used = new Set();
+      let cur = base;
+      for (;;) {
+        const next = model.members.find((m) => m.glued && !used.has(m.id) && (m.a === cur.id || m.b === cur.id));
+        if (!next) break;
+        used.add(next.id);
+        cur = byId.get(next.a === cur.id ? next.b : next.a);
+        chain.push(cur);
+      }
+      return { base, chain };
+    });
+  }
+
+  it('truss builds at least two glued piers floor-to-deck at mid budgets', () => {
+    for (const seed of ['p1', 'p2', 'p3']) {
+      const model = generateBridge({ type: 'truss', seed, budget: 120, stickLen: 80 });
+      expect(model.meta.piers, `truss seed ${seed}`).toBeGreaterThanOrEqual(2);
+      const cols = pierColumns(model);
+      expect(cols.length, `truss seed ${seed} fixed floor bases`).toBeGreaterThanOrEqual(2);
+      for (const { chain } of cols) {
+        expect(chain[chain.length - 1].y).toBeLessThan(deckY + 6);
+        expect(chain[chain.length - 1].y).toBeGreaterThan(deckY - 6);
+      }
+      const pierMembers = model.members.filter((m) => m.glued);
+      expect(pierMembers.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('suspension also gets the minimum pier pair', () => {
+    for (const seed of ['p1', 'p2']) {
+      const model = generateBridge({ type: 'suspension', seed, budget: 120, stickLen: 80 });
+      expect(model.meta.piers, `suspension seed ${seed}`).toBeGreaterThanOrEqual(2);
+      expect(pierColumns(model).length).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('rich budgets add more than the minimum pair', () => {
+    const truss = generateBridge({ type: 'truss', seed: 'rich-p', budget: 300, stickLen: 80 });
+    expect(truss.meta.piers).toBeGreaterThan(2);
+    const susp = generateBridge({ type: 'suspension', seed: 'rich-p', budget: 300, stickLen: 80 });
+    expect(susp.meta.piers).toBeGreaterThan(2);
+  });
+
+  it('flat beams never get piers', () => {
+    const model = generateBridge({ type: 'flat', seed: 'nof', budget: 300, stickLen: 80 });
+    expect(model.meta.piers ?? 0).toBe(0);
+    expect(model.nodes.filter((n) => n.fixed && Math.abs(n.y - GROUND_Y) < 1)).toHaveLength(0);
+  });
+
+  it('pier pair is placed before extra structure so tight budgets still get two', () => {
+    const model = generateBridge({ type: 'truss', seed: 'tight-p', budget: 40, stickLen: 80 });
+    expect(sticksUsed(model)).toBeLessThanOrEqual(40);
+    expect(model.meta.piers).toBeGreaterThanOrEqual(2);
+  });
+
+  it('unaffordable piers are skipped without breaking the model', () => {
+    const model = generateBridge({ type: 'truss', seed: 'poor-p', budget: 20, stickLen: 40, span: 800 });
+    expect(validate(model)).toEqual([]);
+    expect(isConnected(model)).toBe(true);
+    expect(sticksUsed(model)).toBeLessThanOrEqual(20);
+    expect(deckPath(model).nodes.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
 describe('strength scatter', () => {
   it('varies member strength around the base value', () => {
     const model = generateBridge({ type: 'truss', seed: 'str', budget: 120, stickLen: 80 });
