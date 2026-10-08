@@ -215,4 +215,26 @@ describe('physics simulation', () => {
     }
     expect(outcome).not.toBe('stuck');
   });
+
+  it('piers stand as rigid columns floor-to-deck and the bridge carries a human', () => {
+    const model = generateBridge({ type: 'truss', seed: 'pier-sim', budget: 120, stickLen: 80 });
+    expect(model.meta.piers).toBeGreaterThanOrEqual(2);
+    const sim = createSim(model);
+    sim.spawnWalker(byId('human'));
+
+    const deckYs = new Set();
+    for (const m of model.members) {
+      if (!m.glued) continue;
+      const body = sim.bodies.get(m.id);
+      const ys = body.vertices.map((v) => v.y);
+      const xs = body.vertices.map((v) => v.x);
+      expect(Math.max(...ys), 'pier foot on the canyon floor').toBeGreaterThan(690);
+      expect(Math.min(...ys), 'pier head at deck level').toBeLessThan(deckY + 25);
+      expect(Math.max(...xs) - Math.min(...xs), 'pier column is vertical and slender').toBeLessThan(20);
+      deckYs.add(body.id);
+    }
+
+    run(sim, 2000, (s) => s.walkerCrossed());
+    expect(sim.walkerCrossed()).toBe(true);
+  });
 });

@@ -566,7 +566,7 @@ Truss and suspension bridges get at least two glued support columns (piers) stan
 **Files:**
 - Test: `tests/sim.test.js`
 
-- [ ] **Step 1: Failing test.** Truss budget 120: after settle, each pier's merged column body spans floor-to-deck (min vertex y within 30 of deckY, max vertex y within 10 of groundY), and the bridge still carries the human across.
-- [ ] **Step 2: Implement if needed** (glued-chain merge should already handle piers; fix whatever the test finds).
-- [ ] **Step 3: `npm test`, `npm run build`, `npm run e2e` green; visual screenshot check that piers render as columns under the deck.**
-- [ ] **Step 4: Commit** `test: pier columns stand and carry load` + final gate commit `chore: piers final gate`
+- [x] **Step 1: Failing test.** Truss budget 120: after settle, each pier's merged column body spans floor-to-deck (min vertex y within 30 of deckY, max vertex y within 10 of groundY), and the bridge still carries the human across.
+- [x] **Step 2: Implement if needed** (glued-chain merge should already handle piers; fix whatever the test finds).
+- [x] **Step 3: `npm test`, `npm run build`, `npm run e2e` green; visual screenshot check that piers render as columns under the deck.**
+- [x] **Step 4: Commit** `test: pier columns stand and carry load` + final gate commit `chore: piers final gate`
