@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createModel, addNode, addMember, sticksUsed, validate, isConnected, deckPath } from '../src/game/model.js';
-import { WORLD } from '../src/game/config.js';
+import { WORLD, worldFor } from '../src/game/config.js';
 
 function chainModel() {
   const m = createModel('flat', 1, 100, 80);
@@ -23,9 +23,13 @@ describe('createModel', () => {
     expect(m.seed).toBe('s1');
     expect(m.budget).toBe(120);
     expect(m.stickLen).toBe(80);
+    expect(m.span).toBe(640);
     expect(m.nodes).toEqual([]);
     expect(m.members).toEqual([]);
     expect(m.meta).toEqual({});
+  });
+  it('stores a custom span', () => {
+    expect(createModel('flat', 1, 100, 80, 800).span).toBe(800);
   });
 });
 
@@ -119,5 +123,16 @@ describe('deckPath', () => {
     const c = addNode(m, WORLD.gapX1, WORLD.deckY, true);
     addMember(m, a.id, b.id, 'stick');
     expect(() => deckPath(m)).toThrow();
+  });
+  it('uses the model span to find anchors', () => {
+    const g = worldFor(480);
+    const m = createModel('flat', 1, 100, 80, 480);
+    const a = addNode(m, g.gapX0, g.deckY, true);
+    const b = addNode(m, (g.gapX0 + g.gapX1) / 2, g.deckY);
+    const c = addNode(m, g.gapX1, g.deckY, true);
+    addMember(m, a.id, b.id, 'stick');
+    addMember(m, b.id, c.id, 'stick');
+    const path = deckPath(m);
+    expect(path.nodes.map((n) => n.id)).toEqual([a.id, b.id, c.id]);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { WORLD, MATERIAL, MASS_SCALE, LADDER, FACTS, HINTS, DEFAULTS } from '../src/game/config.js';
+import { WORLD, MATERIAL, MASS_SCALE, LADDER, FACTS, HINTS, DEFAULTS, SPAN, worldFor } from '../src/game/config.js';
 
 describe('WORLD', () => {
   it('has a sane canyon layout', () => {
@@ -64,7 +64,36 @@ describe('DEFAULTS', () => {
     expect(DEFAULTS.budget).toBeLessThanOrEqual(300);
     expect(DEFAULTS.stickLen).toBeGreaterThanOrEqual(40);
     expect(DEFAULTS.stickLen).toBeLessThanOrEqual(120);
+    expect(DEFAULTS.span).toBeGreaterThanOrEqual(SPAN.min);
+    expect(DEFAULTS.span).toBeLessThanOrEqual(SPAN.max);
     expect(['flat', 'truss', 'suspension']).toContain(DEFAULTS.type);
+  });
+});
+
+describe('SPAN and worldFor', () => {
+  it('default span matches the fixed WORLD layout', () => {
+    const g = worldFor(SPAN.default);
+    expect(g).toEqual(WORLD);
+  });
+
+  it('builds a centered gap of the requested width', () => {
+    const g = worldFor(800);
+    expect(g.gapX1 - g.gapX0).toBe(800);
+    expect(g.gapX0).toBe((g.width - 800) / 2);
+    expect(g.deckY).toBe(WORLD.deckY);
+    expect(g.groundY).toBe(WORLD.groundY);
+  });
+
+  it('clamps spans outside the allowed range', () => {
+    expect(worldFor(100).gapX1 - worldFor(100).gapX0).toBe(SPAN.min);
+    expect(worldFor(9999).gapX1 - worldFor(9999).gapX0).toBe(SPAN.max);
+    expect(worldFor(undefined).gapX1 - worldFor(undefined).gapX0).toBe(SPAN.default);
+  });
+
+  it('keeps room for spawn and cliffs at the widest span', () => {
+    const g = worldFor(SPAN.max);
+    expect(g.gapX0).toBeGreaterThan(120);
+    expect(g.width - g.gapX1).toBeGreaterThan(120);
   });
 });
 

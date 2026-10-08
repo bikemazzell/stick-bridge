@@ -7,6 +7,28 @@ export const WORLD = {
   groundY: 700,
 };
 
+export const SPAN = {
+  min: 480,
+  max: 800,
+  default: 640,
+};
+
+// Per-round world geometry: the canyon gap is centered and as wide as the
+// requested span. Canvas size, deck line, and ground stay fixed.
+export function worldFor(span) {
+  const requested = Number.isFinite(span) ? span : SPAN.default;
+  const clamped = Math.max(SPAN.min, Math.min(SPAN.max, Math.round(requested)));
+  const gapX0 = (WORLD.width - clamped) / 2;
+  return {
+    width: WORLD.width,
+    height: WORLD.height,
+    gapX0,
+    gapX1: gapX0 + clamped,
+    deckY: WORLD.deckY,
+    groundY: WORLD.groundY,
+  };
+}
+
 export const MATERIAL = {
   stick: {
     breakStretch: 0.6,
@@ -66,4 +88,5 @@ export const DEFAULTS = {
   type: 'truss',
   budget: 120,
   stickLen: 80,
+  span: SPAN.default,
 };

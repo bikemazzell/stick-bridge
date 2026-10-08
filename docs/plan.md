@@ -351,3 +351,64 @@ Bugs e2e caught and fixed: (1) Replay used START from result state which the FSM
 - [x] Commit `chore: final gate and plan checkboxes`
 
 Spec coverage verified: menu (3 type cards with sketches, budget 20-300, stickLen 40-120, seed + dice, rotating hints), build animation, walker ladder (10 walkers fly->tank), stuck rule (1800 ticks), collapse result overlay (heaviest crossed / broke under / fact / Replay / New Bridge), seeded determinism everywhere in game logic, stress HUD %, day/night cycle, seeded weather (rain 30%), canyon + river + trees scenery, camera shake + dust on break, tumbling debris, query params + window.__game debug hooks for e2e. No audio, as specified.
+
+---
+
+## Feature: Variable canyon span (4th round setting)
+
+The canyon gap is currently fixed at 640 px (`WORLD.gapX0/gapX1`). This feature makes the span a 4th round setting: menu slider 480-800 (step 20, default 640) plus `?span=` query param. Geometry becomes per-round: `worldFor(span)` derives a centered gap (`gapX0 = (1280 - span) / 2`) and every span-dependent module (model deckPath, generators, physics cliffs, scenery) reads geometry from the model's span instead of the `WORLD` constant. `WORLD` itself stays as the fixed canvas-size/world reference (= `worldFor(640)` values) for full-canvas consumers (sky, weather, resize).
+
+Budget safety: at span max 800 and stickLen min 40 the deck needs ceil(800/40) = 20 panels = 20 sticks = budget slider minimum, so a complete deck is always affordable. Suspension gets a degenerate guard: when fewer than 2 sticks remain after the deck, towers/cables are skipped (a towerless cable-less deck) so `sticksUsed <= budget` holds everywhere.
+
+### Task 13: Span config + model geometry
+
+**Files:**
+- Modify: `src/game/config.js`
+- Modify: `src/game/model.js`
+- Test: `tests/config.test.js`, `tests/model.test.js`
+
+- [x] **Step 1: Failing tests.** Config: `worldFor(640)` matches WORLD values; `worldFor(800)` has `gapX1 - gapX0 === 800` and is centered; clamps outside `[480, 800]`; `DEFAULTS.span` within SPAN range. Model: `createModel` stores span, defaults 640; `deckPath` resolves anchors for a hand-built span-700 chain at `worldFor(700)` anchors.
+- [x] **Step 2: Implement.** config.js: add `SPAN = { min: 480, max: 800, default: 640 }`, `worldFor(span)` (clamp + round + centered gap), `DEFAULTS.span`. model.js: `createModel(type, seed, budget, stickLen, span)` sets `span: span ?? 640`; `deckPath` uses `worldFor(model.span)`.
+- [x] **Step 3: `npx vitest run` green.**
+- [x] **Step 4: Commit** `feat: variable span config and model geometry`
+
+### Task 14: Span-aware generators
+
+**Files:**
+- Modify: `src/game/bridge/deck.js`, `src/game/bridge/truss.js`, `src/game/bridge/suspension.js`, `src/game/bridge/generator.js`
+- Test: `tests/generators.test.js`
+
+- [ ] **Step 1: Failing tests.** Parametrized (3 types x spans [480, 800] x budgets [20, 200]): `validate` empty, connected, `sticksUsed <= budget`, anchors fixed at exact `worldFor(span)` corners, deck chain complete with spacing `<= stickLen + 7`, reproducible per seed. Suspension degenerate: span 800 / budget 20 / stickLen 40 stays within budget (no towers).
+- [ ] **Step 2: Implement.** deck.js: drop `WORLD` destructure + `spanWidth()`, use `worldFor(model.span)`; same for truss.js (score via `deck.nodes[i].x`, candidates take `deckY` param) and suspension.js (geometry per model; `remaining < 2` skips towers/cables, `meta.towerHeight = 0`). generator.js: accept + forward `span`.
+- [ ] **Step 3: `npx vitest run` green.**
+- [ ] **Step 4: Commit** `feat: span-aware bridge generators`
+
+### Task 15: Span-aware physics
+
+**Files:**
+- Modify: `src/game/physics/sim.js`
+- Test: `tests/sim.test.js`
+
+- [ ] **Step 1: Failing tests.** Flat span 800 + fly: walker spawns left of the new gap (`x < worldFor(800).gapX0`), crosses within 900 ticks (proves cliffs + crossed threshold moved). Truss span 480 budget 200 + human: survives (narrower bridge is stronger or equal).
+- [ ] **Step 2: Implement.** sim.js: compute `const { width, height, gapX0, gapX1, deckY, groundY } = worldFor(model.span)` inside `createSim`; delete module-level `WORLD` destructure.
+- [ ] **Step 3: `npx vitest run` green.**
+- [ ] **Step 4: Commit** `feat: span-aware physics world`
+
+### Task 16: Span in scenery, menu, params, e2e
+
+**Files:**
+- Modify: `src/render/scenery.js`, `src/render/renderer.js`, `src/ui/menu.js`, `src/game/params.js`, `src/main.js`, `e2e/run.mjs`
+- Test: `tests/render.test.js`, `tests/ui.test.js`, `tests/params.test.js`
+
+- [ ] **Step 1: Failing tests.** Scenery: `createScenery(seed, 800)` trees all inside the new cliffs; renderer/menu/params: span slider exists with default, `onStart` payload includes span, `parseParams` reads `span`.
+- [ ] **Step 2: Implement.** scenery.js: `createScenery(seed, span)` stores span, `drawScenery` uses `worldFor(scenery.span)` (backdrop midpoints center-relative). renderer.js: `ensureAssets(seed, span)` resets on span change. menu.js: slider 480-800 step 20 + payload. params.js: `span` numeric key. main.js: pass `span` in draw frameState.
+- [ ] **Step 3: `npx vitest run` green.**
+- [ ] **Step 4: E2e scenario S7:** `?seed=e2e-span&type=truss&budget=200&span=800&speed=4` reaches testing, `getConfig().span === 800`, screenshot `span.png`; run `npm run e2e` green.
+- [ ] **Step 5: Commit** `feat: span setting in scenery, menu and e2e`
+
+### Task 17: Final gate (span feature)
+
+- [ ] `npm test` green.
+- [ ] `npm run build` clean.
+- [ ] `npm run e2e` green (all scenarios incl. span).
+- [ ] Tick all checkboxes above; commit `chore: span feature final gate`

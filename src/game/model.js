@@ -1,11 +1,12 @@
-import { WORLD } from './config.js';
+import { worldFor } from './config.js';
 
-export function createModel(type, seed, budget, stickLen) {
+export function createModel(type, seed, budget, stickLen, span) {
   return {
     type,
     seed,
     budget,
     stickLen,
+    span: span ?? 640,
     nodes: [],
     members: [],
     meta: {},
@@ -83,11 +84,12 @@ export function isConnected(model) {
 }
 
 export function deckPath(model, epsilon = 5) {
+  const { gapX0, gapX1, deckY } = worldFor(model.span);
   const deckNodes = model.nodes
-    .filter((n) => Math.abs(n.y - WORLD.deckY) <= epsilon)
+    .filter((n) => Math.abs(n.y - deckY) <= epsilon)
     .sort((a, b) => a.x - b.x);
-  const left = deckNodes.find((n) => n.x <= WORLD.gapX0 + epsilon);
-  const right = deckNodes.find((n) => n.x >= WORLD.gapX1 - epsilon);
+  const left = deckNodes.find((n) => n.x <= gapX0 + epsilon);
+  const right = deckNodes.find((n) => n.x >= gapX1 - epsilon);
   if (!left || !right) {
     throw new Error('deck anchors not found at deck level');
   }
